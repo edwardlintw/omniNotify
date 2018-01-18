@@ -1,0 +1,339 @@
+diff -r omniNotify.original/examples/demo_add_filter.cc omniNotify/examples/demo_add_filter.cc
+2c2,3
+< #include <iostream.h>
+---
+> #include <iostream>
+> using namespace std;
+diff -r omniNotify.original/examples/demo_offer_change.cc omniNotify/examples/demo_offer_change.cc
+2c2,3
+< #include <iostream.h>
+---
+> #include <iostream>
+> using namespace std;
+diff -r omniNotify.original/examples/demo_subscription_change.cc omniNotify/examples/demo_subscription_change.cc
+2c2,3
+< #include <iostream.h>
+---
+> #include <iostream>
+> using namespace std;
+diff -r omniNotify.original/examples/legacy_clients.cc omniNotify/examples/legacy_clients.cc
+7,8c7,9
+< #include <iostream.h>
+< #include <iomanip.h>
+---
+> #include <iostream>
+> #include <iomanip>
+> using namespace std;
+diff -r omniNotify.original/examples/ndadmin.cc omniNotify/examples/ndadmin.cc
+9c9,10
+< #include <iostream.h>
+---
+> #include <iostream>
+> using namespace std;
+diff -r omniNotify.original/examples/parse_cmd_line.h omniNotify/examples/parse_cmd_line.h
+7c7,8
+< #include <iostream.h>
+---
+> #include <iostream>
+> using namespace std;
+diff -r omniNotify.original/examples/sample_clients.cc omniNotify/examples/sample_clients.cc
+10,12c10,13
+< #include <fstream.h>
+< #include <iostream.h>
+< #include <iomanip.h>
+---
+> #include <fstream>
+> #include <iostream>
+> #include <iomanip>
+> using namespace std;
+diff -r omniNotify.original/examples/sample_functions.cc omniNotify/examples/sample_functions.cc
+5,6c5,7
+< #include <iostream.h>
+< #include <iomanip.h>
+---
+> #include <iostream>
+> #include <iomanip>
+> using namespace std;
+diff -r omniNotify.original/examples/some_notify_clients.cc omniNotify/examples/some_notify_clients.cc
+7c7,8
+< #include <iostream.h>
+---
+> #include <iostream>
+> using namespace std;
+diff -r omniNotify.original/include/ModFlexLexer.h omniNotify/include/ModFlexLexer.h
+91c91,92
+< #include <iostream.h>
+---
+> #include <iostream>
+> using namespace std;
+diff -r omniNotify.original/include/RDIHashFuncs.h omniNotify/include/RDIHashFuncs.h
+35a36
+> #include "corba_wrappers.h"
+107a109,122
+> inline unsigned int RDI_CorbaSLongHash(const void* K)
+> { CORBA::Long l = *((CORBA::Long *) K); return (l < 0) ? -l : l; }
+>     
+> inline unsigned int RDI_CorbaULongHash(const void* K)
+> { return *((CORBA::ULong *) K); }
+> 
+> inline int RDI_CorbaSLongRank(const void* L, const void* R)
+> { return *((CORBA::Long *) L) - *((CORBA::Long *) R); }
+> 
+> inline int RDI_CorbaULongRank(const void* L, const void* R)
+> { CORBA::ULong l = *((CORBA::ULong *) L), r = *((CORBA::ULong *) R);
+>   return (l < r) ? -1 : ((l > r) ? 1 : 0); 
+> }
+> 
+diff -r omniNotify.original/include/RDITimeWrappers.h omniNotify/include/RDITimeWrappers.h
+238c238
+<     CORBA::ULong ts, tn;
+---
+>     unsigned long ts, tn;
+398c398
+<     CORBA::ULong ts, tn;
+---
+>     unsigned long ts, tn;
+diff -r omniNotify.original/include/RDIstrstream.h omniNotify/include/RDIstrstream.h
+64a65
+> #if SIZEOF_LONG_LONG != SIZEOF_LONG
+67a69
+> #endif
+diff -r omniNotify.original/include/omniorb_boa_wrappers_impl.h omniNotify/include/omniorb_boa_wrappers_impl.h
+54c54
+<   sprintf(maxgiopcon, "%lu", _max_giop_connections);
+---
+>   sprintf(maxgiopcon, "%lu", (unsigned long)_max_giop_connections);
+diff -r omniNotify.original/include/omniorb_common_wrappers.h omniNotify/include/omniorb_common_wrappers.h
+127,128c127,128
+<   omni::orbParameters::clientCallTimeOutPeriod.secs = m / 1000; \
+<   omni::orbParameters::clientCallTimeOutPeriod.nanosecs = (m % 1000) * 1000000; \
+---
+>   omni::orbParameters::clientCallTimeOutPeriod.s = m / 1000; \
+>   omni::orbParameters::clientCallTimeOutPeriod.ns = (m % 1000) * 1000000; \
+132,133c132,133
+<   omni::orbParameters::serverCallTimeOutPeriod.secs = m / 1000; \
+<   omni::orbParameters::serverCallTimeOutPeriod.nanosecs = (m % 1000) * 1000000; \
+---
+>   omni::orbParameters::serverCallTimeOutPeriod.s = m / 1000; \
+>   omni::orbParameters::serverCallTimeOutPeriod.ns = (m % 1000) * 1000000; \
+140c140
+<      (omni::orbParameters::clientCallTimeOutPeriod.secs * 1000 + omni::orbParameters::clientCallTimeOutPeriod.nanosecs / 1000000)
+---
+>      (omni::orbParameters::clientCallTimeOutPeriod.s * 1000 + omni::orbParameters::clientCallTimeOutPeriod.ns / 1000000)
+142c142
+<      (omni::orbParameters::serverCallTimeOutPeriod.secs * 1000 + omni::orbParameters::serverCallTimeOutPeriod.nanosecs / 1000000)
+---
+>      (omni::orbParameters::serverCallTimeOutPeriod.s * 1000 + omni::orbParameters::serverCallTimeOutPeriod.ns / 1000000)
+diff -r omniNotify.original/lib/ChannelAdmin_i.cc omniNotify/lib/ChannelAdmin_i.cc
+57,62c57,62
+<   _prx_any_push(RDI_ULongHash, RDI_ULongRank),
+<   _prx_any_pull(RDI_ULongHash, RDI_ULongRank),
+<   _prx_struc_push(RDI_ULongHash, RDI_ULongRank),
+<   _prx_struc_pull(RDI_ULongHash, RDI_ULongRank),
+<   _prx_batch_push(RDI_ULongHash, RDI_ULongRank),
+<   _prx_batch_pull(RDI_ULongHash, RDI_ULongRank)
+---
+>   _prx_any_push(RDI_CorbaULongHash, RDI_CorbaULongRank),
+>   _prx_any_pull(RDI_CorbaULongHash, RDI_CorbaULongRank),
+>   _prx_struc_push(RDI_CorbaULongHash, RDI_CorbaULongRank),
+>   _prx_struc_pull(RDI_CorbaULongHash, RDI_CorbaULongRank),
+>   _prx_batch_push(RDI_CorbaULongHash, RDI_CorbaULongRank),
+>   _prx_batch_pull(RDI_CorbaULongHash, RDI_CorbaULongRank)
+74c74
+<   sprintf(buf, "cadmin%ld", serial);
+---
+>   sprintf(buf, "cadmin%ld", (long)serial);
+1695,1700c1695,1700
+<   _prx_any_push(RDI_ULongHash, RDI_ULongRank),
+<   _prx_any_pull(RDI_ULongHash, RDI_ULongRank),
+<   _prx_struc_push(RDI_ULongHash, RDI_ULongRank),
+<   _prx_struc_pull(RDI_ULongHash, RDI_ULongRank),
+<   _prx_batch_push(RDI_ULongHash, RDI_ULongRank),
+<   _prx_batch_pull(RDI_ULongHash, RDI_ULongRank)
+---
+>   _prx_any_push(RDI_CorbaULongHash, RDI_CorbaULongRank),
+>   _prx_any_pull(RDI_CorbaULongHash, RDI_CorbaULongRank),
+>   _prx_struc_push(RDI_CorbaULongHash, RDI_CorbaULongRank),
+>   _prx_struc_pull(RDI_CorbaULongHash, RDI_CorbaULongRank),
+>   _prx_batch_push(RDI_CorbaULongHash, RDI_CorbaULongRank),
+>   _prx_batch_pull(RDI_CorbaULongHash, RDI_CorbaULongRank)
+1709c1709
+<   sprintf(buf, "sadmin%ld", serial);
+---
+>   sprintf(buf, "sadmin%ld", (long)serial);
+3087c3087
+<     sprintf(buf, "proxy%ld", ac1.key());
+---
+>     sprintf(buf, "proxy%ld", (long)ac1.key());
+3091c3091
+<     sprintf(buf, "proxy%ld", sc1.key());
+---
+>     sprintf(buf, "proxy%ld", (long)sc1.key());
+3095c3095
+<     sprintf(buf, "proxy%ld", bc1.key());
+---
+>     sprintf(buf, "proxy%ld", (long)bc1.key());
+3099c3099
+<     sprintf(buf, "proxy%ld", ac2.key());
+---
+>     sprintf(buf, "proxy%ld", (long)ac2.key());
+3103c3103
+<     sprintf(buf, "proxy%ld", sc2.key());
+---
+>     sprintf(buf, "proxy%ld", (long)sc2.key());
+3107c3107
+<     sprintf(buf, "proxy%ld", bc2.key());
+---
+>     sprintf(buf, "proxy%ld", (long)bc2.key());
+3329c3329
+< 	sprintf(buf, "proxy%ld", ac1.key());
+---
+> 	sprintf(buf, "proxy%ld", (long)ac1.key());
+3339c3339
+< 	sprintf(buf, "proxy%ld", sc1.key());
+---
+> 	sprintf(buf, "proxy%ld", (long)sc1.key());
+3349c3349
+< 	sprintf(buf, "proxy%ld", bc1.key());
+---
+> 	sprintf(buf, "proxy%ld", (long)bc1.key());
+3359c3359
+< 	sprintf(buf, "proxy%ld", ac2.key());
+---
+> 	sprintf(buf, "proxy%ld", (long)ac2.key());
+3369c3369
+< 	sprintf(buf, "proxy%ld", sc2.key());
+---
+> 	sprintf(buf, "proxy%ld", (long)sc2.key());
+3379c3379
+< 	sprintf(buf, "proxy%ld", bc2.key());
+---
+> 	sprintf(buf, "proxy%ld", (long)bc2.key());
+3546c3546
+<     sprintf(buf, "proxy%ld", ac1.key());
+---
+>     sprintf(buf, "proxy%ld", (long)ac1.key());
+3550c3550
+<     sprintf(buf, "proxy%ld", sc1.key());
+---
+>     sprintf(buf, "proxy%ld", (long)sc1.key());
+3554c3554
+<     sprintf(buf, "proxy%ld", bc1.key());
+---
+>     sprintf(buf, "proxy%ld", (long)bc1.key());
+3558c3558
+<     sprintf(buf, "proxy%ld", ac2.key());
+---
+>     sprintf(buf, "proxy%ld", (long)ac2.key());
+3562c3562
+<     sprintf(buf, "proxy%ld", sc2.key());
+---
+>     sprintf(buf, "proxy%ld", (long)sc2.key());
+3566c3566
+<     sprintf(buf, "proxy%ld", bc2.key());
+---
+>     sprintf(buf, "proxy%ld", (long)bc2.key());
+3787c3787
+< 	sprintf(buf, "proxy%ld", ac1.key());
+---
+> 	sprintf(buf, "proxy%ld", (long)ac1.key());
+3797c3797
+< 	sprintf(buf, "proxy%ld", sc1.key());
+---
+> 	sprintf(buf, "proxy%ld", (long)sc1.key());
+3807c3807
+< 	sprintf(buf, "proxy%ld", bc1.key());
+---
+> 	sprintf(buf, "proxy%ld", (long)bc1.key());
+3817c3817
+< 	sprintf(buf, "proxy%ld", ac2.key());
+---
+> 	sprintf(buf, "proxy%ld", (long)ac2.key());
+3827c3827
+< 	sprintf(buf, "proxy%ld", sc2.key());
+---
+> 	sprintf(buf, "proxy%ld", (long)sc2.key());
+3837c3837
+< 	sprintf(buf, "proxy%ld", bc2.key());
+---
+> 	sprintf(buf, "proxy%ld", (long)bc2.key());
+diff -r omniNotify.original/lib/EventChannel_i.cc omniNotify/lib/EventChannel_i.cc
+68,69c68,69
+<   _supl_admin(RDI_ULongHash, RDI_ULongRank), 
+<   _cons_admin(RDI_ULongHash, RDI_ULongRank),
+---
+>   _supl_admin(RDI_CorbaULongHash, RDI_CorbaULongRank), 
+>   _cons_admin(RDI_CorbaULongHash, RDI_CorbaULongRank),
+78c78
+<   sprintf(buf, "chan%ld", myserial);
+---
+>   sprintf(buf, "chan%ld", (long)myserial);
+1583c1583
+<   _defadm(defadm), _server_qos(s_qos), _channel(RDI_ULongHash, RDI_ULongRank)
+---
+>   _defadm(defadm), _server_qos(s_qos), _channel(RDI_CorbaULongHash, RDI_CorbaULongRank)
+2130c2130
+<     sprintf(buf, "cadmin%ld", c.key());
+---
+>     sprintf(buf, "cadmin%ld", (long)c.key());
+2135c2135
+<     sprintf(buf, "sadmin%ld", s.key());
+---
+>     sprintf(buf, "sadmin%ld", (long)s.key());
+2530c2530
+<     sprintf(buf, "chan%ld", cursor.key());
+---
+>     sprintf(buf, "chan%ld", (long)cursor.key());
+diff -r omniNotify.original/lib/FilterAdmin_i.cc omniNotify/lib/FilterAdmin_i.cc
+311c311
+<   _filters(RDI_ULongHash, RDI_ULongRank)
+---
+>   _filters(RDI_CorbaULongHash, RDI_CorbaULongRank)
+diff -r omniNotify.original/lib/Filter_i.cc omniNotify/lib/Filter_i.cc
+78c78
+<   new RDIFilterKeyMap(RDI_SLongHash, RDI_SLongRank,128,20);
+---
+>   new RDIFilterKeyMap(RDI_CorbaSLongHash, RDI_CorbaSLongRank,128,20);
+88,89c88,89
+<   _callbacks(RDI_ULongHash, RDI_ULongRank),
+<   _callbacks_i(RDI_ULongHash, RDI_ULongRank),
+---
+>   _callbacks(RDI_CorbaULongHash, RDI_CorbaULongRank),
+>   _callbacks_i(RDI_CorbaULongHash, RDI_CorbaULongRank),
+122c122
+<   sprintf(buf, "filter%ld", _fid);
+---
+>   sprintf(buf, "filter%ld", (long)_fid);
+1234c1234
+<     sprintf(buf, "mapfilter%ld", _classctr);
+---
+>     sprintf(buf, "mapfilter%ld", (long)_classctr);
+1468c1468
+<     sprintf(buf, "filter%ld", cursor.key());
+---
+>     sprintf(buf, "filter%ld", (long)cursor.key());
+diff -r omniNotify.original/lib/RDIParser_l.cc omniNotify/lib/RDIParser_l.cc
+56c56,57
+< #include <iostream.h>
+---
+> #include <iostream>
+> using namespace std;
+diff -r omniNotify.original/lib/RDITimeWrappers.cc omniNotify/lib/RDITimeWrappers.cc
+149c149
+<   CORBA::ULong ts, tm;
+---
+>   unsigned long ts, tm;
+diff -r omniNotify.original/lib/RDIstrstream.cc omniNotify/lib/RDIstrstream.cc
+198a199
+> #if SIZEOF_LONG_LONG != SIZEOF_LONG
+218a220
+> #endif
+diff -r omniNotify.original/lib/fixlexout.pl omniNotify/lib/fixlexout.pl
+16c16
+< #                #include <iostream.h>
+---
+> #                #include <iostream>
+77c77
+<     print OUTFILE "#include <iostream.h>\n"; $outlines++;
+---
+>     print OUTFILE "#include <iostream>\n"; $outlines++;
