@@ -1,0 +1,119 @@
+[1.2 RELEASE NOTES]
+
+These are the release notes for omniNotify 1.2.
+
+Release 1.2 depends on omniORB version 3.0.4.  It does not work
+with omniORB 4.x.  omniNotify release 2.0 and later will work
+with omniORB 4.x.
+
+It should be possible to build omniNotify on most of the platforms on
+which one can build the omniORB libraries. So far, we have
+successfully built omniNotify on:
+
+ * Linux 2.x (x86)/egcs-1.1.2/binutils-2.9.1.0.14/GNU Libc version 2
+ * Solaris 2.{5,6,7}/ Sun SparcCompiler C++ version 4.2
+ * SGI Irix 6.x/SGI C++ compiler 7.2
+
+omniNotify is not yet a complete implementation of the CORBA
+Notification Service specification. The following features are not
+supported in the current release.
+
+  * Mapping filters
+  * Persistent Events and State
+  * some wilcard cases -- see the omniNotify 1.0 release notes
+
+Release 1.2 is mostly a bug-fix release.
+The following are the changes since release 1.1.
+
+
+ADDED SOME EXTRA FUNCTIONALITY
+------------------------------
+
+1. There is a new ndadmin program in the examples directory. It
+   supports the same Interactive Mode supported by notifd via the -i
+   option. Thus, you can now start notifd without -i, and at any time
+   start up an ndadmin to interactively control it. Note that 'exit' no
+   longer destroys the server, it simply exits the Interactive Mode. To
+   destroy the server, use 'shutdown'.
+
+2. A new delay param, -M, was added to all the examples. Use -h with
+   any of the example programs for info.
+
+FIXED ALL KNOWN 1.1 BUGS
+------------------------
+
+Bug Number:  1
+Summary:  If -DNO_DEBUG is used, RDIRVM.cc did not compile.
+Date Reported:  Oct ??, 2001
+Reported by:  reg
+Date Fixed:  Oct 28, 2001
+Fixed by:  reg
+Description:  
+   There was a section headed by #ifndef NO_DEBUG where this was placed
+   at the wrong point, causing a compilation error if -DNO_DEBUG is used
+   as a compilation flag.  (Use of this flag is not recommended unless
+   obtaining a tiny bit more performance is important.)
+
+Bug Number: 2
+Summary: At server level, "cleanup all" did things in the wrong order --
+         the right order is now used.
+Date Reported: Oct ??, 2001
+Reported by: reg
+Date Fixed: Oct 28, 2001
+Fixed by: reg
+Description:
+   "cleanup all" is equivalent to "cleanup both" followed by "cleanup
+   filters" (this is the right order to do things, because after
+   cleanup both is used, some admins and proxies that were not needed
+   have been removed, possibly enabling cleanup of some filters that
+   were attached to these proxies or admins).
+
+Bug Number: 3
+Summary: 2 memory leaks
+Date Reported: Oct 30, 2001
+Reported by: Mark Zimmerman
+Date Fixed: Nov 2, 2001
+Fixed by: reg + mz
+Description:
+   A typo in RDIEvent.h caused a leak of an internal cached data item.
+   A bug in object initialization in omniorb_poa_wrappers.h causes a
+   leak of ObjectIds.
+
+Bug Number: 4
+Summary: CosEvent 2 connect cases allow nil
+Date Reported: Nov 24, 2001
+Reported by: Alexey Syomichev, Mike Ladwig
+Date Fixed: Nov 28, 2001
+Fixed by: reg
+Description:
+   For CosEvent (legacy) API, conncet_pull_consumer and
+   connect_push_supplier are supposed to allow nil as the argument,
+   but omniNotify was raising BAD_PARAM.  This was due to following
+   the error-checking that is required for the newer CosNotification
+   connect calls.
+
+Bug Number: 5
+Summary: object references now released properly
+Date Reported: Dec 14, 2001
+Reported by: Janet Tvedt
+Date Fixed: Feb 28, 2002
+Fixed by: reg
+Description:
+   omniORB cleans up object references once their internal ref count
+   goes to zero.  The programmer must do the appropriate number of
+   duplicates and releases, otherwise the references stay around,
+   resulting in what is effectively a memory leak.  LeakTracer was
+   used to track down and fix a number of these cases.  There do not
+   seem to be any other memory leaks at this time.
+
+Bug Number: 6
+Summary: deadlock case fixed
+Date Reported: Jan 22, 2002
+Reported by: Janet Tvedt
+Date Fixed: Feb 28, 2002
+Fixed by: reg
+Description:
+   Event lock was not always acquired in the correct order relative to
+   acquiring an operation lock, resulting in a deadlock scenario.
+
+

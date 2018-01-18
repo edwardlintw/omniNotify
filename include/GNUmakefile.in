@@ -1,0 +1,32 @@
+TOP=..
+CURRENT=include
+BASE_OMNI_TREE=@top_srcdir@
+VPATH=@srcdir@
+INSTALL=@INSTALL@
+
+INSTALLDIR = $(INSTALLINCDIR)/omniNotify
+
+HEADERS = corba_wrappers.h corba_wrappers_impl.h			\
+CosEventChannelAdmin_i.h CosNfyUtils.h CosNotification_i.h		\
+CosNotifyChannelAdmin_i.h CosNotifyFilter_i.h CosNotifyShorthands.h	\
+ModFlexLexer.h omniNotify.h omniorb_boa_wrappers.h			\
+omniorb_boa_wrappers_impl.h omniorb_common_wrappers.h			\
+omniorb_poa_wrappers.h omniorb_poa_wrappers_impl.h			\
+omnithread_thread_wrappers.h RDIBitmap.h RDICatchMacros.h		\
+RDIChannelUtil.h RDIConfig.h RDIConstraint.h RDIDynamicEvalDefs.h	\
+RDIEvalDefs.h RDIEvent.h RDIEventQueue.h RDI.h RDIHashFuncs.h		\
+RDIHash.h RDIInteractive.h RDIInteractiveMode.h RDILimits.h RDIList.h	\
+RDIMutex.h RDINotifQueue.h RDINotifServer.h RDIOplocks.h		\
+RDIOplocksMacros.h RDIOSWrappers.h RDIRVMPool.h RDIStaticEvalDefs.h	\
+RDIStringDefs.h RDIstrstream.h RDIsysdep.h RDIThreadPriority.h          \
+RDITimeWrappers.h RDITypeMap.h RDIUtil.h thread_wrappers.h timebase.h
+
+include $(TOP)/mk/beforeauto.mk
+
+install:: $(HEADERS)
+	@(dir="$(INSTALLDIR)"; \
+          for file in $^; do \
+            $(ExportFileToDir) \
+          done )
+
+include $(TOP)/mk/afterauto.mk

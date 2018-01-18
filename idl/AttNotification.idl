@@ -1,0 +1,282 @@
+// -*- Mode: C++; -*-
+// AttNotification provides access to additional, non-standard
+// functionality not defined in the CosNotification specification.
+//
+// It provides one 'wrapper' interface for each major kind of entity
+// in the specification.
+//
+// It also provides a Server interface that gives access to
+// the omniNotify daemon (notifd).
+
+#ifndef _ATT_NOTIFICATION_IDL_
+#define _ATT_NOTIFICATION_IDL_
+
+// omniORB specific pragmas to insert extra includes into the stub header.
+#pragma hh #include "ATTN_sysdep.h"
+
+#pragma prefix "att.com"
+
+#ifdef _IDL_TO_JAVA
+#pragma javaPackage "com.att"
+#endif
+
+#include "CosEventChannelAdmin.idl"
+#include "CosNotifyChannelAdmin.idl"
+#include "CosNotifyFilter.idl"
+
+module AttNotification {
+
+  // ================================ OVERVIEW =====================================
+  // Each kind of entity managed by omniNotify
+  //   (server, filter factory, channel factory, channel, admin, proxy)
+  // has an AttNotification interface associated with it that you can narrow to
+  // given a reference to standard interface.
+  //
+  // For example, given a CosNotifyChannelAdmin::EventChannel referene, you can
+  // narrow to AttNotification::EventChannel.  The added functionality available
+  // via these (proprietary) interfaces is as follows:
+  //
+  // [ALL]: *All* the AttNotification interfaces support the Interactive interface
+  //        described below.
+  //
+  // [EventChannelFactory]: 
+  //         This interface supports the CosNotification::QoSAdmin and
+  //         CosNotification::AdminPropertiesAdmin interfaces, allowing
+  //         one to get/set the NotifQoS and AdminQoS properties
+  //         that are used as *DEFAULTS* by the channel factory
+  //         for contruction of new channels.  Note that any channels
+  //         that have already been constructed are not affected by
+  //         a change to these factory-level properties.
+  //
+  // [EventChannel]: 
+  //         CosNotification::EventTypeSeq obtain_subscription_types();
+  //         CosNotification::EventTypeSeq obtain_offered_types();
+  //            -- these obtain methods avoid having to allocate a dummy proxy
+  //         ChannelStats obtain_stats();
+  //            -- return a description of the current channel stats
+  // 
+  // [Filter]: 
+  //         CosNotifyFilter::FilterID MyFID();
+  //            -- omniNotify filters have unique filter ids
+  //
+  // In addition, there  is an interface AttNotification::Server, which  
+  // has no corresponding interface in the standard.  In addition to
+  // the Interactive interface, AttNotification::Server supports the following:
+  // 
+  //         void                  destroy();
+  //            -- destroy the server (shuts down the daemon)
+  //         FilterFactory         get_filter_factory();
+  //         EventChannelFactory   get_channel_factory();
+  //         EventChannel          get_default_channel()
+  //            -- get the described AttNotification entity
+  //         boolean               results_to_file();
+  //            -- indicates whether do_command results are written to a file
+  //               (as opposed to stdout or stderr)
+  //         ServerProperties    get_server_props();
+  //         void                set_server_props(in ServerProperties props)
+  //			               raises ( UnsupportedServerProp );
+  //            -- these are similar to get_admin and set_admin calls
+  //               used on the standard EventChannel interface, but control
+  //               server-level properties (see omniNotify documentation).
+  // 
+  // ===============================================================================
+
+  // ---------------------------- Interactive Interface ----------------------------
+  //
+  // do_command: executes cmd, outputs description of result to report log and
+  //     also returns the result description as a string.
+  //     The boolean out param indicates whether the command succeeded.
+  //     If the command failed, the resulting description will *not*
+  //     include a description of valid commands.
+  //     If target_changed is set to true, then next_target is set to a new target
+  //     (e.g., "up" produces parent target).
+  //
+  //
+  // my_name: returns sequence of string names from top to target, e.g.,
+  //     [ "server", "chanfact", "chan0", "cadmin1" ]
+  //
+  // child_names: returns sequence of string names of all immediate children, e.g.,
+  //     [ "proxy4", "proxy7" ]
+  //
+  // children: return a sequence of (Interactive) immediate children
+  //     if only_cleanup_candidates is true, only children that might be part of a
+  //     cleanup are returned. Cleanup candidates = children that are:
+  //        * factories, channels, or admins
+  //        * proxies that have no connected client
+  //        * filters that have no callbacks
+  //
+  // safe_cleanup : if safe to do so, destroy target
+  //                    return true if destroyed, else false
+  //
+  //     * No factories are destroyed
+  //     * No channels are destroyed
+  //     * A filter with callbacks is not destroyed
+  //     * A proxy with a connected client is not destroyed
+  //     * Default admins are not destroyed
+  //     * An admin with proxies is not destroyed
+  //         (thus, non-connected proxies must be destroyed
+  //           before safe_cleanup will destroy an admin)
+  //
+  // -------------------------------------------------------------------------------
+
+  interface Interactive;
+  typedef sequence<Interactive> IactSeq;
+  typedef sequence<string>      NameSeq;
+
+  interface Interactive {
+
+    string  do_command(in string cmd, out boolean success,
+		       out boolean target_change, out Interactive next_target);
+    NameSeq my_name();
+    NameSeq child_names();
+
+    IactSeq children(in boolean only_cleanup_candidates);
+    boolean safe_cleanup();
+  };
+
+  // Entities
+
+  // ------------------------------ Proxies ------------------------------
+
+  // CosEvent ("old-style") proxies
+
+  interface CosEvProxyPushSupplier :
+    Interactive, CosEventChannelAdmin::ProxyPushSupplier {
+  };
+
+  interface CosEvProxyPullSupplier
+    : Interactive, CosEventChannelAdmin::ProxyPullSupplier {
+  };
+
+  interface CosEvProxyPushConsumer
+    : Interactive, CosEventChannelAdmin::ProxyPushConsumer {
+  };
+
+  interface CosEvProxyPullConsumer
+    : Interactive, CosEventChannelAdmin::ProxyPullConsumer {
+  };
+
+  // CosNotification Any proxies 
+
+  interface ProxyPushSupplier
+    : Interactive, CosNotifyChannelAdmin::ProxyPushSupplier {
+  };
+
+  interface ProxyPullSupplier
+    : Interactive, CosNotifyChannelAdmin::ProxyPullSupplier {
+  };
+
+  interface ProxyPushConsumer
+    : Interactive, CosNotifyChannelAdmin::ProxyPushConsumer {
+  };
+
+  interface ProxyPullConsumer
+    : Interactive, CosNotifyChannelAdmin::ProxyPullConsumer {
+  };
+
+  // CosNotification StructuredEvent proxies
+
+  interface StructuredProxyPushSupplier
+    : Interactive, CosNotifyChannelAdmin::StructuredProxyPushSupplier {
+  };
+
+  interface StructuredProxyPullSupplier
+    : Interactive, CosNotifyChannelAdmin::StructuredProxyPullSupplier {
+  };
+
+  interface StructuredProxyPushConsumer
+    : Interactive, CosNotifyChannelAdmin::StructuredProxyPushConsumer {
+  };
+
+  interface StructuredProxyPullConsumer
+    : Interactive, CosNotifyChannelAdmin::StructuredProxyPullConsumer {
+  };
+
+  // CosNotification EventBatch proxies
+
+  interface SequenceProxyPushSupplier
+    : Interactive, CosNotifyChannelAdmin::SequenceProxyPushSupplier {
+  };
+
+  interface SequenceProxyPullSupplier
+    : Interactive, CosNotifyChannelAdmin::SequenceProxyPullSupplier {
+  };
+
+  interface SequenceProxyPushConsumer
+    : Interactive, CosNotifyChannelAdmin::SequenceProxyPushConsumer {
+  };
+
+  interface SequenceProxyPullConsumer
+    : Interactive, CosNotifyChannelAdmin::SequenceProxyPullConsumer {
+  };
+
+  // ------------------------------ Admins ------------------------------
+
+  interface SupplierAdmin 
+    : Interactive, CosNotifyChannelAdmin::SupplierAdmin {
+  };
+
+  interface ConsumerAdmin 
+    : Interactive, CosNotifyChannelAdmin::ConsumerAdmin { 
+  };
+
+  // ------------------------------ Channel/Factory ------------------------------
+
+  struct ChannelStats {
+    long num_announcements;
+    long num_notifications;
+  };
+
+  interface EventChannel 
+    : Interactive, CosNotifyChannelAdmin::EventChannel {
+    CosNotification::EventTypeSeq obtain_subscription_types();
+    CosNotification::EventTypeSeq obtain_offered_types();
+    // these obtain methods avoid having to allocate a dummy proxy
+    ChannelStats                  obtain_stats();
+    // returns a subset of the full set of statistics tracked by the channel
+  };
+
+  interface EventChannelFactory 
+    : Interactive, CosNotifyChannelAdmin::EventChannelFactory,
+    CosNotification::QoSAdmin, CosNotification::AdminPropertiesAdmin {
+  };
+
+  // ------------------------------ Filter/Factory ------------------------------
+
+  interface Filter 
+    : Interactive, CosNotifyFilter::Filter { 
+	CosNotifyFilter::FilterID MyFID();
+  };
+
+  interface MappingFilter 
+    : Interactive, CosNotifyFilter::MappingFilter { 
+  };
+
+  interface FilterFactory 
+    : Interactive, CosNotifyFilter::FilterFactory {
+  };
+
+  // ------------------------------ Server ------------------------------
+  // results_to_file:
+  //     indicates whether do_command results are written to a file
+  //     (as opposed to stdout or stderr)
+
+  typedef CosNotification::PropertySeq ServerProperties;
+  exception UnsupportedServerProp { CosNotification::PropertyErrorSeq server_prop_err; };
+
+  interface Server
+    : Interactive {
+    void                destroy();
+    FilterFactory       get_filter_factory();
+    EventChannelFactory get_channel_factory();
+    EventChannel        get_default_channel();
+    boolean             results_to_file();
+    ServerProperties    get_server_props();
+    void                set_server_props(in ServerProperties props)
+			               raises ( UnsupportedServerProp );
+  };
+
+};
+
+#endif  // _ATT_NOTIFICATION_IDL_
+

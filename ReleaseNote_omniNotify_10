@@ -1,0 +1,65 @@
+[1.0 RELEASE NOTES]
+
+These are the release notes for omniNotify 1.0 (the initial
+release). You should start by looking at the latest release notes;
+these may provide additional useful information.
+
+Release 1.0 depends on omniORB version 3.0.2
+
+Important: The implementation currently uses BOA stubs. We plan to
+switch to using POA stubs in the near future. If you are considering
+modifying the omniNotify library or daemon, please contact us first
+since you are much better off doing developing against the POA code.
+
+Although the current examples are also written using BOA stubs, there
+are no constraints on what kinds of clients you write. If you write
+POA-based clients you should include "COS/CosNotification.hh"; (and
+related .hh files) and link against libCOS3. If you write BOA-based
+clients you should include "COS/BOA/CosNotification.hh" (and related
+.hh files) and link against libCOSBOA3.
+
+It should be possible to build omniNotify on most of the platforms on
+which one can build the omniORB libraries. So far, we have
+successfully built omniNotify on:
+
+ * Linux 2.x (x86)/egcs-1.1.2/binutils-2.9.1.0.14/GNU Libc version 2
+ * Solaris 2.{5,6}/ Sun SparcCompiler C++ version 4.2
+ * SGI Irix 6.x/SGI C++ compiler 7.2
+ * HP-UP 11.0 / aCC
+
+omniNotify is not yet a complete implementation of the CORBA
+Notification Service specification. The following features are not
+supported in the current release.
+
+  * Mapping filters
+  * Order and Discard QoS properties
+  * Persistent Events and State
+
+In addition, at present there is only partial wildcard support. In
+general, an event type has two parts, a domain name and type name,
+written D::T. omniNotify supports a wildcard for the entire domain
+name and/or type name, but not as a part of a name that contains some
+character literals. In other words, "*::*", "*::T";, "D::*", and
+"D::T" forms are supported, where D and T are string literals, but an
+event type such as foo*::bar*zot is not yet supported.
+
+We are in the process of implementing all of the above features.
+
+Conformance Testing Notes
+-------------------------
+
+DSTC (http://www.dstc.com) has a publically available conformance test
+suite for CosNotification services, available as part of a demo
+download of dCon, a java-based CosNotification service. omniNotify
+passes all of the test cases in the test suite released with dCon
+version 2.2. However, we had to fix a bug in 2 of the test cases.
+EventChannelTest6 and EventChannelTest7 are supposed to test the use
+of the MaxConsumers and MaxSuppliers QoS properties. One test is
+supposed to set MaxConsumers to 1 and then try to connect more than 1
+consumer, while the other is supposed to set MaxSuppliers to 1 and
+then try to connect more than 1 supplier. The bug is that the test
+which sets MaxConsumers tries to connect 2 suppliers while the test
+which sets MaxSuppliers tries to connect 2 consumers. Switching the
+use of MaxConsumers/MaxSuppliers in the 2 tests gives you correct
+versions of these test cases.
+

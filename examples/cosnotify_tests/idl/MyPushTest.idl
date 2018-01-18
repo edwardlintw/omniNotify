@@ -1,0 +1,20 @@
+module MyPushTest {
+  typedef string  MyAr5[5];
+  typedef long    MyAr10[10];
+ 
+  enum MyEnum { e0, e1, e2, e3, e4, e5, e6, e7, e8, e9 };
+  union MyUnType switch (MyEnum) {
+  case e0: MyAr5           e0_ar5;
+  case e1: MyAr10          e1_ar10;
+  case e2: string          e2_str;
+  case e3: boolean         e3_b;
+  case e4: unsigned short  e4_us;
+  case e5: long            e5_l;
+  case e6: short           e6_s;
+  default: boolean         def_b;
+  };
+
+  interface Consumer {
+    void push(in any data);
+  };
+};

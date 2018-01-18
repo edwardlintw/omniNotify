@@ -1,0 +1,6 @@
+omniNotify 2.1 Release Notes
+----------------------------
+
+This is a trivial bug-fix release.
+Fixes a bug that I introduced when adding default clauses to a couple of switch statements to get rid of compiler warnings.
+

@@ -1,0 +1,183 @@
+READING THE CODE
+----------------
+
+Because the code for the 12 CosNotification cases is similar, and also
+because it is instructive to see how the code differs, we have placed
+common code fragments together into several .h files:
+
+sample_clients.h/.cc : 
+
+  Contains 12 implementation classes which implement the different
+  CosNotificationclients.  These classes can be configured in different
+  ways -- command-line arguments plus some defaults are fed into
+  the static create method to get different behavior.  See the comment
+  at the top of sample_clients.h for a description of the
+  configuration params.
+
+  Each class creates a single helper thread when an object of
+  the class is constructed.  The helper thread is used as follows:
+
+    * For push suppliers, the helper thread runs a push loop that
+      pushes events to its proxy (i.e., pushes to the channel)
+      until the desired # of events is reached.
+      If _millisecs has been set (using the -m option) 
+      then after each push the thread waits for the specified
+      number of milliseconds.
+
+    * For pull consumers, the helper thread runs a pull loop
+      that calls a pull method on its proxy (i.e., pulls from the channel)
+      until the desired # of events is reached.
+      If _millisecs has been set (using the -m option) 
+      then after each pull the thread waits for the specified
+      number of milliseconds.
+
+    * For push consumers and pull suppliers, if _millisecs has
+      been set (using the -m option) then the helper thread
+      runs a "ping" loop that invokes a method on its proxy
+      every _millisecs milliseconds -- the result is ignored
+      as the only purpose of the invocation is to test whether
+      the proxy is alive.
+
+In all cases, if the helper thread encounters a communication
+error while communicating with its proxy, it sets an error flag
+and its _done flag to 1, which forces the client
+program to cleanup and exit.  (One could have programmed 
+some retries, but our sample code is already complicated enough!!)
+
+Note that for push consumers and pull suppliers the main work (push or
+pull) occurs in an incoming invocation thread (controlled by omniORB)
+each time the channel either calls push or try_pull on the client.  It
+is not strictly necessary to have a helper thread that performs a ping
+loop, however without this thread the client would never discover that
+a notification channel has crashed, since it would simply wait forever
+for a push or try_pull call that never arrives.  
+
+In contrast, push suppliers and pull consumers will detect channel
+failure when they actively try to push an event to the channel or pull
+an event from the channel, thus they do not need to do a ping loop.
+
+legacy_clients.h/.cc :
+
+  Contains 4 implementation classes which implement the different
+  legacy CosEvents clients.  These are very similar to the
+  clients in sample_clients, except these cases do not require
+  support for the new CosNotification features such as filtering,
+  offer_change, and subscription_change.
+
+sample_functions.h/.cc :
+
+  The implementation classes can be instantiated with user-specified
+  functions that override the default behavior for event supplying,
+  event consuming, and subscription_change/offer_change handling.
+  sample_functions.h contains the typedefs for these function
+  parameters and declares sample versions of each kind of
+  function.  sample_functions.cc has the implementations of
+  for these declarations.  (These sample versions that are used by
+  default unless different user-specified functions are specified when
+  constructing one of the 12 client classes.)
+
+There are also several .h files with useful helper routines:
+
+parse_cmd_line.h :
+
+  Contains a helper routine that parses command-line arguments and
+  reports usage information if there is an error.
+
+getopt_impl.h :
+
+  Contains an implementation of getopt() for platforms (e.g. Windows)
+  that do not have it.
+
+get_channel.h :
+
+  Contains functions that get a CosNotifyChannelAdmin::EventChannel reference
+  by looking up a name in the naming service or by reading an stringified 
+  IOR from a file.
+
+main_program.h :
+
+  This file contains an implementation of the main program.  Only a few
+  things differ across the different clients, which is why we can
+  take this approach of putting the common code in main_program.h.
+
+  Before including main_program.h, some macros must be defined (described below).
+  The main program initializes the ORB and default POA and then carries out
+  these steps:
+
+ (1) Parse the command line arguments.
+     We use the function from parse_cmd_line.h.
+
+ (2) Obtain a reference to a notification channel.  We use 2
+     get-channel functions from get_channel.h, one that uses the
+     naming service, one that uses a stringified IOR stored in a file.
+
+ (3) Create an instance of a class that implements the
+     appropriate supplier or consumer API.  Each program uses a 
+     different class from sample_clients.h/.cc.  For this step
+     to work, these macros must be defined:
+
+     CLIENT_IMPL_CLASS : the name of the class that implements the
+                         required consumer or supplier interface
+
+     CLIENT_CLASS_VAR  : the name of the _var variable type for the
+                         interface that the client class implements 
+
+     CLIENT_NAME       : a name for the client
+
+     SUPPLY_OR_CONSUME_FN : the name of an appropriate supply or consume
+                            function, such as one of the functions
+                            in sample_functions.cc
+
+     For the legacy client examples, LEGACY_CLIENT must be defined.
+     For the other client examples, LEGACY_CLIENT should *not* be defined,
+     but this macro must be defined:
+
+     CHANGE_FN:        the name of an appropriate function for
+                       handling offer_change or subscription_change calls,
+                       such as one of the functions in sample_functions.cc
+
+  (4) Active the POA manager
+
+  (5) Set things in motion: connect the client to its proxy and
+     have it start pushing/pulling events; wait for the desired # of events.
+     We use the client methods client->connect() and client->wait_done().
+
+
+The 16 main client programs simply define appropriate macros and then
+include main_program.h.  For example, any_push_consumer.cc defines these macros:
+
+#define CLIENT_IMPL_CLASS  PushConsumer_i
+#define CLIENT_CLASS_VAR   CosNotifyComm::PushConsumer_var
+#define CLIENT_NAME        "any_push_consumer"
+
+#define SUPPLY_OR_CONSUME_FN sample_consume_any_fn
+#define CHANGE_FN            sample_offer_change_fn
+
+In English, the macros have the following effect:
+
+They select class PushConsumer_i, which is a consumer that implements
+the CosNotifyComm::PushConsumer interface.  The name chosen for the
+consumer is "any_push_consumer".  The consume function chosen is
+"sample_consume_any_fn" which is a function that expects a
+CORBA::ULong to be stored in CORBA::Any events.  The change function
+chosen, sample_offer_change_fn, simply outputs a description of each
+offer_change message that is received by the consumer.
+
+---------------------------------------------------------
+MODIFYING THE CODE FOR YOUR OWN NEEDS:
+
+Note that we used external functions to do supplying and consuming so
+that we could avoid code duplication.  The downside is that this approach
+is not a good object-oriented coding style.  
+
+If you copy one of the classes in sample_functions.h/.cc and change it
+for your own needs, it might make sense to eliminate the function
+parameters and to implement the supply or consume behavior directly in
+the class's push or pull methods.
+
+Similarly, you should probably copy the code in main_program.h into a
+top-level <client_program_name>.cc file and modify it to suit your
+needs, rather than continuing to use the approach of defining macros
+prior to including main_program.h.
+
+

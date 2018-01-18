@@ -1,0 +1,145 @@
+This is an alpha version of omniNotify 2.0.
+
+omniNotify is copyright AT&T Laboratories - Research. It is free
+software. The programs in omniNotify are distributed under the GNU
+General Public License as published by the Free Software Foundation.
+See the file COPYING for copying permission of these programs. The
+libraries in omniNotify are distributed under the GNU Library General
+Public License. See the file COPYING.LIB for copying permission of
+these libraries.
+
+
+IMPORTANT
+=========
+
+The latest information about omniNotify is always available via
+the omniNotify home page,
+
+ http://www.research.att.com/~ready/omniNotify/index.html
+
+Via that page you can:
+
+  + download patches, source releases, and binary releases (see
+    'download' link)
+
+  + learn how to use the anonymous CVS server
+    to checkout the omniNotify source (see 'download' link)
+
+  + learn how to sign up for the omninotify mailing list so that you
+    will learn about future releases (see 'keeping in touch' link)
+
+Contact and mailing list information is also provided at the end of
+this file.
+
+
+Feedback Please!
+================
+
+Once you test-drive omniNotify, consider sending us feedback...
+what is good or bad; what is missing that you need?  Is there
+a question that should be in the FAQ? 
+
+We are also very interested in hearing about how omniNotify is being
+used.
+
+
+Technical Highlights
+====================
+
+omniNotify is an implementation of the OMG CORBA Notification Service
+(current specification: ftp://ftp.omg.org/pub/docs/telecom/99-07-01.pdf)
+
+- Implemented in C++
+
+- Scalable filter evaluation and event dispatching architecture
+
+- Support for Any, Structured, and Batch events
+
+- Push and Pull models of event distribution
+
+- Administrative and Notification QoS properties
+
+- Backward compatible with the OMG Event Service Specification
+
+
+Work in progress
+================
+
+omniNotify is not yet a complete implementation of the CORBA Notification
+Service specification.  See the latest ReleaseNote file for details.
+
+
+Platforms / Porting
+===================
+
+See the latest ReleaseNote file for supported platforms.
+
+If you find that some changes are required to build omniNotify on
+another platform, please send us the changes so that we can
+incorporate them into the omniNotify source tree.  (See the contact
+information below.)
+
+
+Installation	
+============
+
+Installation instructions are provided in the following files:
+
+- <NOTIFY_TOP>/README.unix  for all unix platforms
+- <NOTIFY_TOP>/README.win32 for all Windows platforms
+
+
+Documentation
+=============
+
+- README files are provided throughout the tree rooted at
+  <NOTIFY_TOP>.  They provide specific information about directories
+  and files, tools, and examples. You may want to explore the tree to
+  become familiar with the information provided in the README files.
+
+- HTML-based documentation is located in the <NOTIFY_TOP>/wwwfiles
+  directory.  Point your browser to the 'index.html' file for a
+  starting point.  ** HOWEVER ** we strongly suggest using the online
+  web pages mentioned at the top of this file; they are always
+  up-to-date.
+
+
+Examples
+========
+
+- Some example programs demonstrating use of omniNotify are in:
+
+	<NOTIFY_TOP>/examples
+
+  The README file in the directory contains the necessary information
+  about the various applications included in this directory.
+
+
+Contact Information
+===================
+
+You can send queries, suggestions and problems regarding omniNotify
+to ready@research.att.com.  We'd like to hear from you.
+
+The latest version of omniNotify is available from:
+
+    http://www.research.att.com/~ready/omniNotify/nfy_download.html
+
+There is also a mailing list. See this page for details:
+
+    http://www.omniorb-support.com/mailman/listinfo/omninotify-list
+
+This list provides a forum for omniNotify users and developers 
+to discuss the usage and future development of omniNotify. 
+It also carries announcements of new releases of omniNotify.
+
+The archives of the list are available at:
+
+    http://www.omniorb-support.com/pipermail/omninotify-list/
+
+
+
+** omniNotify home page: http://www.research.att.com/~ready/omniNotify/
+
+** omniORB    home page: http://omniorb.sourceforge.net/
+

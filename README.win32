@@ -1,0 +1,46 @@
+This file contains information on installing, building and using
+omniNotify on Windows platforms.
+
+Roadmap
+=======
+
+The directory structure of the omniNotify source tree is:
+
+.\daemon		: source files for the omniNotify daemon
+.\examples		: source files for examples
+.\include		: include files
+.\lib			: source files for the omniNotify library
+.\mk			: make files
+.\bin\scripts		: scripts used by autoconf
+.\wwwfiles		: omniNotify WEB pages
+
+
+Building
+========
+
+omniNotify must be built inside a working omniORB tree. Extract
+omniNotify so it is in the directory <OMNI_TOP>\src\services.
+
+You should already have omniORB4.0.2 installed and tested
+under <OMNI_TOP>.  See the file <OMNI_TOP>\README.win32 for
+details.
+
+We refer to directory <OMNI_TOP>\src\services\omniNotify as
+<NOTIFY_TOP>.
+  
+To build and install everything, simply go into the directory
+<NOTIFY_TOP> and type 'make export'. If all goes well, the libraries
+and executables will be installed into <OMNI_TOP>\lib\x86_win32\ and
+<OMNI_TOP>\bin\x86_win32\ -- note that these directories are located
+under the top of the omniORB installation tree, not the omniNotify
+subtree.
+
+ 
+Examples
+========
+
+You are strongly encouraged to try out the examples provided in
+<NOTIFY_TOP>\examples. They are built during the normal compile.
+
+The file <NOTIFY_TOP>\examples\README describes what the example
+programs do and how to run them.

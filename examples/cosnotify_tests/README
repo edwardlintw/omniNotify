@@ -1,0 +1,146 @@
+This is an alpha version of a suite of test programs released with
+omniNotify (under directory cosnotify_test).  The test suite is geared
+towards testing omniNotify, but can probably be used (with one or
+two small changes) to test other notification services.
+
+LICENSE
+=======
+The test programs under cosnotify_tests are copyright AT&T
+Laboratories - Research. They are free software.  The tests are
+distributed under the GNU General Public License as published by the
+Free Software Foundation.  See the file COPYING for copying permission
+of these programs.
+
+PLEASE GIVE FIXES and NEW TESTS BACK TO THE OMNINOTIFY COMMUNITY
+================================================================
+
+Other users of this test suite would very much appreciate hearing
+about fixes or new test cases that you have added.  Please send mail
+to omninotify-list AT omniorb-support.com.
+
+GETTING STARTED: PREREQS
+========================
+
+cosnotify_tests requires omniORBpy which in turn requires
+omniORB.  See http://omniorb.sourceforge.net for details
+on acquiring omniORB and omniORBpy.
+
+You should configure and build omniORB and omniORBpy
+before going any further.  In addition, you should make
+sure that your PATH, PYTHONPATH, and LD_LIBRARY_PATH
+are configured as recommended in the omniORB/omniORBpy
+README files.
+
+BUILDING
+========
+
+First you must build stubs for the various CORBA interfaces
+that are used by the test suite:
+
+> cd ./Stubs
+> ./mkall.py
+
+You should add ./Stubs to your PYTHONPATH environment variable, as in:
+
+(bash/sh/ksh:)  export PYTHONPATH=./Stubs:$PYTHONPATH
+
+(csh/tcsh:) setenv PYTHONPATH ./Stubs:$PYTHONPATH
+
+CONFIGURING THE TEST CASES
+==========================
+
+Before you run a batch of tests you can configure which tests
+are selected, and you can also configure some general params.
+The default settings give you a reasonable (small)
+set of initial test cases.  After you have these test cases
+working, you will want to explore the configuration files
+to set up additional tests.
+
+The following files are of interest:
+
+Config/TopConf.py
+-----------------
+(See comments in this file for details.)
+
+This file controls verbosity of output, max tests in a category, etc.
+It also has timeout values, which must be large enough to allow
+successful cases to complete, but small enough such that tests that
+require a timeout to occur will complete in a reasonable time span.
+
+In general there are the following kinds of tests:
+
+(1) Supplier-consumer tests that have 3 sub-kinds:
+
+'Normal' supplier-consumer tests (enabled with SUPCON_DO_NORMAL)
+These are tests where good things should happen.
+
+'Special' supplier-consumer tests (enabled with SUPCON_DO_SPECIAL)
+Tests with various error scenarious or other special cases.
+
+'Incompat' supplier-consumer tests (enabled with SUPCON_DO_INCOMPAT)
+Tests where supplier does not provide events that the consumer
+expects.
+
+For these tests, you can control whether push clients are used
+via SUPCON_PUSH_CLIENTS, and whether pull clients are used
+via SUPCON_PULL_CLIENTS.  At least one of these two must be
+set to 1.
+
+(2) 'interfilter' tests which test interactions that occur when
+filters are placed both at admin level and proxy level.  RUN_IFILT
+controls whether these are used, while IFILT_PUSH_CLIENTS and
+IFILT_PULL_CLIENTS control whether push or pull clients (or both) are
+used.
+
+(3) 'standalone' tests that do not fit the mold of any of the other
+tests.  RUN_STANDALONE controls whether these are used.
+
+
+Config/SupCon.py
+----------------
+This file defines all of the supplier-consumer tests, and also
+has a mechanism for selecting subsets of these tests. 
+You can also control the number of suppliers, number of consumers,
+and the batch size for supplier and consumer batches.
+
+In the normal case you will only want to change 1 thing,
+TEST_INDICES.  SupCon.py contains a number of useful
+choices for this control param.  Uncomment just one of these
+choices.  The default setting for TEST_INDICES is a
+set of 20 tests that covers many combinations of
+CosNotification supplier and consumer types.
+
+See comments in file for details.
+
+Config/InterFilterCases.py
+--------------------------
+Normally you do not need to change this file
+See comments for details.
+
+Config/StandAloneCases.py
+-------------------------
+Normally you do not need to change this file
+See comments for details.
+
+RUNNING THE TESTS
+=================
+If you have configured a small number of tests, then from the cosnotify_tests
+directory you can simply enter:
+
+> run_tests.py
+
+If you have configured a large number of tests, you will want to split
+the tests up into 'batches.'  Since a SUMMARY line is printed for each
+batch, you can grep for SUMMARY and quickly find the overall test 
+results.  You can also grep for FAIL to find the failure cases.
+run_tests.py takes a batch number from 1 to 10 via
+the -r flag.  You can invoke each batch yourself, or you can use
+
+>  run10.py 
+
+to invoke run_tests.py with batch numbers 1, 2, ... 10.
+You can also use
+
+> run_range.py x y
+
+to invoke run_tests.py with batch numbers x, x + 1, ... y

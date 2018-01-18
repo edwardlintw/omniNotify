@@ -1,0 +1,61 @@
+omniNotify 2.0 Release Notes
+----------------------------
+
+The most significant change from omniNotify 1.2 to 2.0 is that
+omniNotify 2.0 works with omniORB 4.  For Windows, omniORB4 version
+4.0.2 or later is a requirement (and you are strongly urged to use the
+very latest available omniORB 4 release).  For other operating
+systems, it is probably still possible to using omniNotify 2.0 on top
+of omniORB3, however I am not going to attempt to keep omniNotify
+working with omniORB3 in the future, so you are also strongly urged to
+start using omniORB4!
+
+Duncan Grisby added stand-alone autoconf support and got things
+working on Windows -- thanks Duncan!
+
+omniNotify 2.0 adds a number of new administrative features, such as
+'object garbage collection' of dead filter, channel, admin and proxy
+objects.  See the channel.cfg file (or standard.cfg) for the params
+that control garbage collection.  Also see the new OutgoingTimeout and
+IncomingTimeout params in the config file.
+
+A number of bugs have been fixed, the most important being a couple of
+deadlock cases as well as a case where an event lock was held across a
+push call.  Internal outgoing event queues for proxies are now cleared
+properly in all cases where the proxy is no longer in use.  Removed
+the constraint on type and domain names which were formerly restricted
+to alphanum and underscore -- spec does not have this restriction.
+
+omniNotify 2.0 works with omniORB 4.0.2 (and later).  For Windows,
+omniORB4 is a requirement.  For other operating systems, it is
+probably still possible to using omniNotify 2.0 on top of omniORB3,
+however I am not going to attempt to keep it working with omniORB3, so
+you are strongly urged to start using omniORB4!
+
+One key difference between building against omniORB3 vs. omniORB4 is
+the treatment of TimeBase::TimeT type as found in
+<TOP>/idl/COS/TimeBase.idl, which can either be a struct with 'low'
+and 'high' fields, or a CORBA::ULongLong, depending on the NOLONGLONG
+flag:
+
+#ifdef NOLONGLONG
+	struct ulonglong{
+		unsigned long 		low;
+		unsigned long		high;
+	};
+	typedef ulonglong 		TimeT;
+#else
+	typedef unsigned long long	TimeT;
+#endif
+
+omniORB3 standard builds use the NOLONGLONG flag, while omniORB4
+standard builds do not. This is done because omniORB4 has full support
+for CORBA::ULongLong's passed in ANY values, whereas omniORB3 does
+not. This affects the type in <TOP>/include/COS/TimeBase.hh and the
+stubs/skels in the libCOS4 library that is built when omniORB4 is
+built.  
+
+omniNotify 2.x code assumes that it should use the struct form when
+used with omniORB3, and the CORBA::ULongLong form when used with
+omniORB4.
+

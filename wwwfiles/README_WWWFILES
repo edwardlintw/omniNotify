@@ -1,0 +1,9 @@
+The omniNotify web pages are no longer part of the omniNotify source
+and binary tarball release.
+
+The web pages are undergoing changes; once they become stable we will
+put the back in the release.  In the meantime, it is better if everyone
+uses the online pages:
+
+htpp://www.research.att.com/~ready/omniNotify/index.html
+

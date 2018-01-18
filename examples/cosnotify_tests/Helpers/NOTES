@@ -1,0 +1,590 @@
+Summary of DSTC test cases
+
+
+================================================================================
+FilterTest*
+================================================================================
+
+[DONE] FilterTest1: COVERING CASE = Con_Any_UnionType_tagnum_index_streq
+	"test matching of a union event with an array element"
+	Supply 1 UnionTest.UnionType value with dArray, == test that should pass:
+		$.(3)[2] == 'match string'
+
+[DONE] FilterTest2: COVERING CASE = Con_Any_streq
+	"test matching of a string in an any"
+	Supply an any with a string, == test that should pass:
+		$ == 'match string'
+
+[DONE] FilterTest3: COVERING CASE = Con_Any_numeq
+	"test matching of an int in an any"
+	Supply an any with a long, == test that should pass:
+		$ == 666
+
+[DONE] FilterTest4: COVERING CASE = Con_Any_substr
+        "test matching of a sub-string in an any"
+	Supply an any with a string, substr test that should pass:
+		$ ~ 'a match string'
+	($ is 'match')
+
+[DONE] FilterTest5: COVERING CASE = Con_Any_numaddeq
+	"test addition in a filter expression"
+	Supply an any with a long (667), test:
+		$ = 667 + 1
+
+[DONE] FilterTest6: COVERING CASE = Con_Any_numsubeq
+	"test subtraction in filter expression"
+	Supply an any with a long (667), test:
+		($ - 1) == 666
+
+[DONE] FilterTest7: COVERING CASE = Con_Any_nummuleq
+	"test int multiplication in a filter exp"
+	Supply an any with a long (666), test:
+		($ * 10) == 6660
+
+[DONE] FilterTest8:  COVERING CASE = Con_Any_nummuleq (with Sup_Any_Float)
+	"test FP multiplication in a filter exp"
+	Supply an any with a float (666.0), test:
+		($ * 10) == 6660.0
+
+[DONE] FilterTest9: COVERING CASE = Con_Any_numdiveq
+	"test int division in a filter expr"
+	Supply an any with a long (6660), test:
+		($ / 10) == 666
+
+[DONE] FilterTest10: COVERING CASE = Con_Any_numdiveq (with Sup_Any_Float)
+	"test FP division in a filter expression"
+	Supply an any with a float (6660.0), test:
+		($ / 10) == 666.0
+
+[DONE] FilterTest11: COVERING CASE = Con_Any_numgt
+	"test GT comparison in a filter exp"
+	Supply an any with a long (6660), test:
+		$ > 666
+
+[DONE] FilterTest12: COVERING CASE = Con_Any_numge
+	"test GTE comparison in a filter exp"
+	Supply an any with a long (6660), test:
+		$ >= 666
+	** Why not supply 666?
+
+[DONE] FilterTest13: COVERING CASE = Con_Any_numlt
+	"test LT comparison in a filter exp"
+	Supply an any with a long (666), test:
+		$ < 6660
+
+[DONE] FilterTest14: COVERING CASE = Con_Any_numle
+	"test LTE comparison in a filter exp"
+	Supply an any with a long (666), test:
+		$ <= 6660
+	** Why not supply 6660?
+
+[DONE] FilterTest15: COVERING CASE = Con_Any_strne
+	"test inequality of a string in an any"
+	Supply an any with a string ('match string'), test:
+		$ != 'string match'
+
+[XXX] FilterTest16: NOT IN SPEC!!
+	"test string concatenation in filter exp"
+	Supply an any with a string ('matchstring'), test:
+		$ == 'match' + 'string'
+
+[XXX] FilterTest17: NOT IN SPEC!!
+	"test string subtraction in filter exp"
+	Supply an any with a string ('match'), test:
+		$ == 'matchstring' - 'string'
+
+[DONE] FilterTest18: COVERING CASE = Con_Any_UnionType_tagnum_index_streq_OR
+	"test logical OR in filter expr"
+	Supply 1 UnionTest.UnionType value with dArray, test that should pass:
+		$.(3)[1] == 'match string' or $.(3)[2] == 'match string' 
+	(the second clause is true)
+
+[DONE] FilterTest19: COVERING CASE = Con_Any_UnionType_tagnum_index_streq_AND
+	"test logical AND in filter expr"
+	Supply 1 UnionTest.UnionType value with dArray, test that should pass:
+		$.(3)[1] == 'string match' and $.(3)[2] == 'match string' 
+	(both clauses are true)
+
+[DONE] FilterTest20: COVERING CASE = Con_Any_UnionType_tagnum_index_streq_NOT
+	"test logical NOT in filter expr"
+	Supply 1 UnionTest.UnionType value with dArray, test that should pass:
+		($.(3)[1] == 'string match') and not ($.(3)[3] == 'match string')
+	(both clauses are true)
+
+[XXX] FilterTest21: NOT FOUND
+
+[DONE] FilterTest22: COVERING CASE = Con_Any_UnionType_tagnum_index_EXIST
+	"test EXISTS operator in filter expression"
+	Supply 1 UnionTest.UnionType value with dArray, test that should pass:
+		exist $.(3)[1]
+
+[DONE] FilterTest23: COVERING CASE = Con_Any_UnionType_tagnum_index_IN
+	"test IN operator in filter expression"
+	Supply 1 UnionTest.UnionType value with dArray, test that should pass:
+		('String 2' in  $.(3)) and ('String 1' in  $.(3))
+	dArray vals are [ 'String 0', 'String 1', etc ]
+
+[XXX] FilterTest24: NOT FOUND
+	
+[DONE] FilterTest25: COVERING CASE = Con_Any_divbyzero
+	"test divide by zero trap in Filter expr"
+	Supply an any with a long (666), test:
+		($ / 0.0) == 666
+	EXPECTED CONSUME COUNT = 0
+
+[DONE] FilterTest26: COVERING CASE = Con_Any_UnionType_tagnum_LENGTH
+	"test implicit _length member of sequence in Filter expr"
+	Supply 1 UnionTest.UnionType value with dArray, test that should pass:
+		($.(3)._length > 4) and ($.(3)._length < 6)
+
+[DONE] FilterTest27: COVERING CASE = GrammarCheck
+	"negative test for bad filter create parameter"
+	HAS FOLLOWING CODE:
+		status = false
+		filter = None
+		try:
+		    filter = factory.create_filter("INVALID TCL NAME")
+		except InvalidGrammar:
+		    status = true
+		if (filter != None):
+			filter.destroy()
+
+[DONE] FilterTest28: COVERING CASE = Con_Any_UnionType_dotid_longeq
+	"Test ident in union is long in Filter expr"
+	Supply 1 UnionTest.UnionType value with aLong (val 1), test that should pass:
+		($.aLong == 1)
+
+[DONE] FilterTest29: COVERING CASE = Con_Any_UnionType_dotid_streq
+	"Test ident in union is string in Filter expr"
+	Supply 1 UnionTest.UnionType value with bString (val "foo"), test that should pass:
+		($.bString == 'foo')
+
+[DONE] FilterTest30: COVERING CASE = ConstraintCheck
+	"constraint from spec 2.4.7: (see test)"
+	Simply creates filter, to see whether InvalidConstraint exception occurs
+	(creation should succeed -- expr is valid).  Does not supply/consume an event.
+		$type_name == 'CommunicationsAlarm' and not ($event_name == 'lost_packet')
+	** Presumably checking whether $type_name and $event_name are supported... we
+	can have a StockBondTicker tests that covers this case and actually supplies/consumes events.
+
+[DONE] FilterTest31: COVERING CASE = ConstraintCheck
+	same as FilterTest30 with constraint as follows
+		$type_name == 'CommunicationsAlarm' and $priority >= 1 and $priority <= 5
+
+[DONE] FilterTest32: COVERING CASE = ConstraintCheck
+	same as FilterTest30 with constraint as follows
+		$type_name == 'MOVIE' and (('groucho' in $.starlist) + ('chico' in $.starlist) + ('harpo' in $.starlist) + ('zeppo' in $.starlist) + ('gummo' in $.starlist)) > 2
+	*** Looks like a good candidate for a real test case (summing booleans)
+
+[DONE] FilterTest33: COVERING CASE = ConstraintCheck
+	same as FilterTest30 with constraint as follows
+		$origination_timestamp.high + 2 < $curtime.high
+
+[DONE] FilterTest34: COVERING CASE = ConstraintCheck
+	same as FilterTest30 with constraint as follows
+		$.test._length == 3 and ($.test[1].score + $.test[2].score + $.test[3].score) / 3 >= 80
+
+[DONE] FilterTest35: COVERING CASE = ConstraintCheck
+	same as FilterTest30 with constraint as follows
+		$.memsize / 5.5 + $.cputime * 1275.0 + $.filesize * 1.25 > 500000.0
+
+[DONE] FilterTest36: COVERING CASE = ConstraintCheck
+	same as FilterTest30 with constraint as follows
+		default $._d and $.defvalue == 2
+	*** Looks like a good candidate for a real test case
+
+[DONE] FilterTest37: COVERING CASE = ConstraintCheck
+	same as FilterTest30 with constraint as follows
+		exist $threshold._type_id and $threshold._type_id == 'short'
+
+[DONE] FilterTest38: COVERING CASE = ConstraintCheck
+	same as FilterTest30 with constraint as follows
+		$._repos_id == 'IDL:CosNotification/StructuredEvent:1.0'
+	*** Looks like a good candidate for a real test case
+
+[DONE] FilterTest39: COVERING CASE = ConstraintCheck
+	same as FilterTest30 with constraint as follows
+		$violation(serviceUser)._repos_id == 'IDL:TelecomNotification/ServiceUserType:1.0'
+
+[DONE] FilterTest40: COVERING CASE = ConstraintCheck
+	same as FilterTest30 with constraint as follows
+		exist $.EventHeader.variable_header(required_rights)
+	*** Looks like a good candidate for a real test case
+
+[DONE] FilterTest41: COVERING CASE = ConstraintCheck
+	same as FilterTest30 with constraint as follows
+		($.a + 1 > 32) or ($.b == 5) or ($.c > 3)
+
+[DONE] FilterTest42: COVERING CASE = ConstraintCheck
+	same as FilterTest30 with constraint as follows
+		$.gpa < 80 or $tests(midterm) > $tests(final) or $.monthly_attendance[3] < 10
+
+[DONE] FilterTest43: COVERING CASE = ConstraintCheck
+	"""This test verifies that the invalid constraint in the
+	string expression throws an exception when added to a filter.
+	"""
+	The invalid constraint is:
+		<xml>
+
+[DONE] FilterTest44: GetConstraintsCheck
+	"This test verifies that a constraint can be added to a filter and then retrieved."
+	Pseudo-code:
+		expression = "i == 1"
+		status = false
+		try:
+			# add one constraint
+			exp1 = ConstraintExp( [], expression)
+			exps = [ exp1 ]
+			filter.add_constraints(exps)
+			# check there is only one constraint
+			constraints = filter.get_all_constraints()
+			if (len(constraints) != 1):
+				raise TestFailedException, "ConstraintInfoSequence length != 1"
+			# get the constraint using its id
+			idlist = [ constraints[0].constraint_id ]
+			constraints = filter.get_constraints(idlist)
+			# make sure the constraint string is the same
+			if (!constraints[0].constraint_expression.constraint_expr == expression):
+				raise TestFailedException, "get constraint returned : " + constraints[0].constraint_expression.constraint_expr
+		except InvalidConstraint:
+			status = false
+		except TestFailedException:
+			status = false
+		if (filter != None):
+			filter.destroy()
+		return status
+
+[DONE] FilterTest45: GetConstraintsCheck
+	"verify grammar name and list modification methods"
+	pseudo-code:
+
+	status = 1 # OK
+	GRAMMAR = "EXTENDED_TCL"
+	expressions = ["i == 1", "i == 2"]
+	cons = { }
+        try:
+            # create the filter and check cg
+            filter = factory.create_filter(GRAMMAR)
+            if (!GRAMMAR.equals(filter.constraint_grammar())):
+                raise TestFailedException, "bad constraint grammar name from filter"
+            # add one constraint
+            exp1 = ConstraintExp( [] , expressions[0])
+            exps = [ exp1 ]
+            ci = filter.add_constraints(exps)
+            # check there is only one constraint
+            if (len(ci) != 1):
+                raise TestFailedException, "ConstraintInfo length != 1"
+            # make sure the constraint string is the same
+            if (ci[0].constraint_expression.constraint_expr == expressions[0]):
+                cons[ ci[0].constraint_id ] = expressions[0]
+            else:
+                raise TestFailedException, "add_constraint returned: " + ci[0].constraint_expression.constraint_expr)
+
+            # add another constraint
+            exp2 = ConstraintExp( [], expressions[1])
+            exps = [ exp2 ]
+            ci = filter.add_constraints(exps)
+            # check it was accepted
+            if (len(ci) != 1):
+                raise TestFailedException, "ConstraintInfo length != 1"
+            # make sure the constraint string is the same
+            if (ci[0].constraint_expression.constraint_expr.equals == expressions[1]):
+                cons[ ci[0].constraint_id ] = expressions[1]
+            else:
+                raise TestFailedException, "add_constraint returned : " + ci[0].constraint_expression.constraint_expr
+            # retrieve using array of ID's
+            ids = cons.keys()
+            ci = filter.get_constraints(ids)
+            # check there are still two constraints
+            if (len(ci) != 2):
+                raise TestFailedException, "ConstraintInfo length != 2"
+            # make sure they match what we think they should be
+            for i in range(len(ci))
+                st = cons[ ci[i].constraint_id ]
+                if (st != ci[i].constraint_expression.constraint_expr):
+                    raise TestFailedException, "get_constraints:  id " +
+                     ci[i].constraint_id + " : " +
+                     ci[i].constraint_expression.constraint_expr
+            # remove all constraints and check
+            filter.remove_all_constraints()
+            ci = filter.get_all_constraints()
+            if (len(ci) != 0):
+                raise TestFailedException, "ConstraintInfo length != 0"
+        except InvalidConstraint:
+            status = false
+        except TestFailedException(e):
+            status = false
+        if (filter != None):
+            filter.destroy()
+    	return status
+
+
+================================================================================
+FilterSymTest*
+================================================================================
+
+
+[DONE] FilterSymTest1: COVERING CASE = InterFilterTest cases
+	"Tests OR symantics on group filters of non-default Consumer Admin"
+
+	EVENT_CNT = 10
+	TRIP_CNT  =  5
+
+	The supplier pushes TestDomain::TestType events with a filterable data
+	field CountDown which runs from 0 to EVENT_CNT.  (The event_name field
+	also contains the count, as a string.)
+
+        // Part 1 of the test adds a filter to the default Consumer Admin
+        // then creates and runs a consumer/supplier pair.  We expect
+        // only events greater than the TRIP (5)  i.e., 6, 7, 8, 9
+	
+            "$.header.fixed_header.event_type.type_name == 'TestType'" +
+            " and $.header.fixed_header.event_type.domain_name == 'TestDomain'" +
+            " and $.filterable_data(Countdown) > " + TRIP_CNT)
+
+        // Part 2 of the test adds another filter to the default Consumer Admin
+        // then creates and runs the consumer/supplier pair again.  We expect
+        // events both greater and less than the TRIP (> TRIP OR < TRIP) = 9
+	// i.e., 0, 1, 2, 3, 4,   6, 7, 8, 9 (no 5)
+
+            "$.header.fixed_header.event_type.type_name == 'TestType'" +
+            " and $.header.fixed_header.event_type.domain_name == 'TestDomain'" +
+            " and $.filterable_data(Countdown) < " + TRIP_CNT)
+
+
+        // Part 3 of the test removes and destroys both filters,
+        // then runs exactly the same consumer/supplier pair,
+        // but this time, the events consumed should not be filtered...
+        // consumer should get all events in sequence 0 to 9 
+
+[XXX] FilterSymTest2: NOT FOUND
+
+[DONE] FilterSymTest3: COVERING CASE = InterFilterTest cases
+	"Tests OR symantics on group filters of non-default Supplier Admin"
+	Same as FilterSymTest1 except filters are attached to supplier side admin
+
+[XXX] FilterSymTest4: NOT FOUND
+
+[DONE] FilterSymTest5: COVERING CASE = InterFilterTest cases
+	"Tests OR semantics of filters on consumer's supplier proxy"
+	Same as FilterSymTest1 except filters are attached to consumer proxy rather than admin
+
+[XXX] FilterSymTest6: NOT FOUND
+
+[DONE] FilterSymTest7: COVERING CASE = InterFilterTest cases
+	"Tests OR semantics of filters on supplier's consumer proxy"
+	Same as FilterSymTest3 except filters are attached to supplier proxy rather than admin
+
+[XXX] FilterSymTest8: NOT FOUND
+
+[DONE] FilterSymTest9:  COVERING CASE = InterFilterTest cases
+		(The <=/>= 5 tests are implemented using combo of </> and ==)
+	"Test OR semantics of multiple constraints within a single filter"
+
+        // Part 1 of the test adds a filter with two constraints to a
+        // new Notif Consumer Admin then creates and runs a consumer/
+        // supplier pair.  As we expect OR semantics on multiple
+        // constraints (sect 2.3) only one event will be filtered out.
+
+            "$.header.fixed_header.event_type.type_name == 'TestType'" +
+            " and $.header.fixed_header.event_type.domain_name == 'TestDomain'" +
+            " and $.filterable_data(Countdown) < " + TRIP_CNT)
+
+            "$.header.fixed_header.event_type.type_name == 'TestType'" +
+            " and $.header.fixed_header.event_type.domain_name == 'TestDomain'" +
+            " and $.filterable_data(Countdown) > " + TRIP_CNT)
+
+        // Part 2 removes the filter from the consumer admin
+        // then runs the consumer/supplier pair again.  We expect
+        // all 10 events
+
+[DONE] FilterSymTest10: COVERING CASE = InterFilterTest cases
+	"Test implied AND semantics for filters on supplier and consumer proxies"
+
+		** InterFilterGroupOperator opr = InterFilterGroupOperator.AND_OP
+
+            "$.header.fixed_header.event_type.type_name == 'TestType'" +
+            " and $.header.fixed_header.event_type.domain_name == 'TestDomain'" +
+            " and $.filterable_data(Countdown) >= " + TRIP_CNT)
+
+            "$.header.fixed_header.event_type.type_name == 'TestType'" +
+            " and $.header.fixed_header.event_type.domain_name == 'TestDomain'" +
+            " and $.filterable_data(Countdown) <= " + TRIP_CNT)
+
+        // Part 1 of the test creates a consumer and supplier and
+        // runs them with no filters/constraints applied.
+        // expecting all events in sequence
+
+        // Part 2 add a multiconstraint filter equivalent to
+        // "EVENTS where TimeRemaining >= 5", reruns the C/S
+        // pair and tests the results
+        cons.addFilter(stf1)
+
+        // not expecting to see event less than 5
+
+        // Part 3 removes the previous filter and adds a different
+        // filter equivalent to "EVENTS where TimeRemaining <= 5",
+        // reruns the C/S pair and tests the results
+        cons.addFilter(null)
+        supp.addFilter(stf2)
+
+        // not expecting to see event greater than 5
+
+        // Part 4 adds the first filter again (recall admin was
+        // created with AND semantics) and reruns the C/S pair
+        // The result should be a single event "5".
+        cons.addFilter(stf1)
+
+        // not expecting to see any event but 5
+
+[DONE] FilterSymTest11 :  COVERING CASE = InterFilterTest cases
+		(The <=/>= 5 tests are implemented using combo of </> and ==)
+	"Test implied OR/AND semantics for filters with multiple constraints at supplier and consumer proxies"
+
+	NB: testing AND semantics between filters,
+		testing OR semantics for multiple constraints in a filter
+	** opr = InterFilterGroupOperator.AND_OP
+
+	PAIR 1:
+            "$.header.fixed_header.event_type.type_name == 'TestType'" +
+            " and $.header.fixed_header.event_type.domain_name == 'TestDomain'" +
+            " and $.filterable_data(Countdown) == " + TRIP_CNT),
+
+            "$.header.fixed_header.event_type.type_name == 'TestType'" +
+            " and $.header.fixed_header.event_type.domain_name == 'TestDomain'" +
+            " and $.filterable_data(Countdown) > " + TRIP_CNT)
+
+	PAIR 2:
+            "$.header.fixed_header.event_type.type_name == 'TestType'" +
+            " and $.header.fixed_header.event_type.domain_name == 'TestDomain'" +
+            " and $.filterable_data(Countdown) == " + TRIP_CNT),
+
+            "$.header.fixed_header.event_type.type_name == 'TestType'" +
+            " and $.header.fixed_header.event_type.domain_name == 'TestDomain'" +
+            " and $.filterable_data(Countdown) < " + TRIP_CNT)
+
+	The same as FilterSymTest10 except filters constructed from the above constraint pairs
+
+
+================================================================================
+EventChanFactTest*
+================================================================================
+
+[ ] EventChanFactTest1
+	"Tests retrieving default EventChannel from EventChannelFactory"
+		channel = channelFactory.get_event_channel(0)
+		ecf = channel.MyFactory()
+		# no ready way to compare for equality..
+		if (len(ecf.get_all_channels()) != len(channelFactory.get_all_channels())):
+			print "XXX may not be MyFactory!"
+			status = false
+
+[ ] EventChanFactTest2
+	"Tests creating a new CosNotification EventChannel"
+		channel = channelFactory.get_event_channel(0)
+		newChan, newID = channelFactory.create_channel(channel.get_qos(), channel.get_admin())
+		ecf = newChan.MyFactory()
+		# no ready way to compare for equality..
+		if (len(ecf.get_all_channels()) != len(channelFactory.get_all_channels())):
+			print "XXX may not be MyFactory!"
+			status = false
+
+[ ] EventChanFactTest3
+	"Tests EventChannelFactory correctly tracks EventChannel IDs"
+	like EventChanFactTest2 except it obtains length of get_all_channels
+	prior to creating new one, just after creating new one (length should be 1 greater),
+	and just after deleting new one (should be back to original length)
+
+[ ] EventChanFactTest4
+	"Tests creating new channel with bad QoS props is trapped"
+	** Creates badProp seq with Property("Dummy", CORBA.Any(CORBA._tc_long, 666))
+	** Tries to create new channel with badProp as qos seq
+           (trick of using chan.get_admin() from chan zero for admin argument)
+	==> EXPECTS UnsupportedQoS (could check exception argument -- it does not)
+        ** destroy channel if it was created!
+
+[ ] EventChanFactTest5
+	"Tests creating new channel with bad Admin props is trapped"
+	same test except badProp passed for admin arg
+           (trick of using chan.get_qos() from chan zero for qos argument)
+
+[ ] EventChanFactTest6
+	"Tests retireving a bogus channel ID fails"
+		channel = channelFactory.get_event_channel(-1)
+		==> EXPECTING exception ChannelNotFound
+
+
+================================================================================
+EventChannelTest*
+================================================================================
+
+[ ] EventChannelTest1
+	"Tests EventChannel.new_for_* methods and Admin access by ID"
+	** oldConsCnt = len(channel.get_all_consumeradmins())
+	** admin, cid, channel.new_for_consumers(opr)
+	** consIds = channel.get_all_consumeradmins()
+	** if (len(consIds) != oldConsCnt + 1):
+		error
+	** if (not consIds.find(cid)):
+		error
+	** then do same thing for get_all_supplieradmins / new_for_suppliers,
+              new supplier admin id is sid
+	** finally, create consumer using admin obtained from cid and
+	   supplier using admin obtained from sid, run a simple sup/con test
+
+[ ] EventChannelTest2
+	"test various Exceptions in EventChannelImpl"
+        // testing for the following exceptions:
+        // get_consumeradmin(bad id) => AdminNotFound
+        // get_supplieradmin(bad id) => AdminNotFound
+        // set_admin(bad admin set)  => UnsupportedAdmin
+        // set_qos(bad qos set)      => UnsupportedQoS
+MY NOTES:
+should use two bad NSP arrays,
+	one with maxconsumers and dummy (for testing admin qos)
+	one with orderpolicy and dummy  (for testing regular qos)
+Currently one NSP array as 3 items, maxconsumers, orderpolicy, and dummy,
+but the validateErrors check is passed a failNames array with only dummy as argument
+(but orderpolicy is not a legal ??? and maxconsumers is not a legal ???)
+
+[ ] EventChannelTest3
+	"test validate_qos and destroy methods of EventChannel"
+	* obtain qosProps with channel.get_qos()
+	* shortQosProps = qosProps minus last item
+	* create a new channel with admin and qos from def channel
+	* attempt to do npr = newChan.validate_qos(shortQoSProps)
+	* npr should have length >= 1
+	* the ommitted property name should be in npr
+=> XXX This test is strange.  What is wrong with omitting a property???
+
+[ ] EventChannelTest4
+	"validate legacy CosEvent interfaces for a supplier"
+
+[ ] EventChannelTest5
+	"validate legacy CosEvent interfaces for a consumer"
+
+[ ] FixedEventChannelTest6
+(EventChannelTest6 has MaxSupplier/MaxConsumer backwards)
+	"Tests that setting of MaxSuppliers Admin QoS is respected"
+	** obtains an admin from default channel, verifies MaxSuppliers is an admin property
+	** constructs a new channel with MaxSuppliers set to 1
+	** adds 1 con, 1 sup (should work)
+	** then tries to add another supplier (should fail)
+ 	** verifies sup/con pair work OK
+	** kill of first supplier 
+	** then tries to add another supplier (should work)
+ 	** verifies sup/con pair work OK
+
+[ ] FixedEventChannelTest7
+(EventChannelTest6 has MaxSupplier/MaxConsumer backwards)
+	"Tests that setting of MaxConsumers Admin QoS is respected"
+	as above, except for MaxConsumers (tries another consumer, destroys orig, tries again)
+
+[ ] EventChannelTest8
+	"Tests CosEvent pull consumer to CosNotification pull supplier"
+
+
+[ ] EventChannelTest9
+	"validates legacy CosEvent interfaces for a pull supplier"
+	** uses push consumer, pull supplier
+

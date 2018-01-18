@@ -1,0 +1,126 @@
+---------------------------
+Current location of methods
+---------------------------
+
+---------------------------
+MIXINS 
+
+PingMixin.py
+    __call__   [ -> L_comm_err ]
+
+PullConMixin.py
+    __call__ (uses L_pull_helper, L_got_events, L_comm_err)
+
+PushSupMixin.py
+    __call__ (uses L_need_events, L_push_sup_helper, L_supplied_events, L_comm_err)
+
+CliMixin.py
+    __init__
+    L_disconnect
+    L_add_filter
+    L_connect    [ -> L_connect_helper, L_change_reg_helper ]
+    L_wait_done
+    L_cleanup    [ -> L_cleanup_helper ]
+    L_comm_err
+
+ConMixin.py
+    offer_change
+    L_got_events
+    L_register_consume_fn
+    L_change_reg_helper
+
+SupMixin.py
+    subscription_change
+    L_need_events
+    L_supplied_events
+    L_register_supply_fn
+    L_change_reg_helper
+
+PullSupMixin.py
+    L_try_pull  [ -> L_need_events, L_supplied_events ]
+    L_pull      [ -> L_need_events, L_supplied_events ]
+
+---------------------------------
+FINAL CLASSES (12 total) -- each also has a Create stand-alone routine
+
+AnyPushCon (CosNotifyComm__POA.PushConsumer, CliMixin, ConMixin.C, PushConMixin.C, PingMixin.C)
+    push  [ -> L_got_events ]
+    disconnect_push_consumer [ -> L_disconnect ]
+    L_connect_helper
+    L_cleanup_helper
+
+StructPushCon (CosNotifyComm__POA.StructuredPushConsumer, CliMixin, ConMixin.C, PushConMixin.C, PingMixin.C)
+    push_structured_event [  -> L_got_events ]
+    disconnect_structured_push_consumer [ -> L_disconnect ]
+    L_connect_helper
+    L_cleanup_helper
+
+BatchPushCon (CosNotifyComm__POA.SequencePushConsumer, CliMixin, ConMixin.C, PushConMixin.C, PingMixin.C)
+    push_structured_events  [ -> L_got_events ]
+    disconnect_sequence_push_consumer  [ -> L_disconnect ]
+    L_connect_helper
+    L_cleanup_helper
+
+AnyPullCon (CosNotifyComm__POA.PullConsumer, CliMixin.C, ConMixin.C, PullConMixin.C)
+    disconnect_pull_consumer [ -> L_disconnect ]
+    L_pull_helper
+    L_connect_helper
+    L_cleanup_helper
+
+StructPullCon (CosNotifyComm__POA.StructuredPullConsumer, CliMixin.C, ConMixin.C, PullConMixin.C)
+    disconnect_structured_pull_consumer [ -> L_disconnect ]
+    L_pull_helper
+    L_connect_helper
+    L_cleanup_helper
+
+BatchPullCon (CosNotifyComm__POA.SequencePullConsumer, CliMixin.C, ConMixin.C, PullConMixin.C)
+    disconnect_sequence_pull_consumer [ -> L_disconnect ]
+    L_pull_helper
+    L_connect_helper
+    L_cleanup_helper
+
+AnyPushSup (CosNotifyComm__POA.PushSupplier, CliMixin.C, SupMixin.C, PushSupMixin.C)
+    disconnect_push_supplier [ -> L_disconnect ]
+    L_connect_helper
+    L_cleanup_helper
+    L_push_helper
+
+StructPushSup (CosNotifyComm__POA.StructuredPushSupplier, CliMixin.C, SupMixin.C, PushSupMixin.C)
+    disconnect_structured_push_supplier [ -> L_disconnect ]
+    L_connect_helper
+    L_cleanup_helper
+    L_push_helper
+
+BatchPushSup (CosNotifyComm__POA.SequencePushSupplier, CliMixin.C, SupMixin.C, PushSupMixin.C)
+    disconnect_sequence_push_supplier [ -> L_disconnect ]
+    L_connect_helper
+    L_cleanup_helper
+    L_push_helper
+
+AnyPullSup (CosNotifyComm__POA.PullSupplier, CliMixin.C, SupMixin.C, PullSupMixin.C, PingCliMixin.C)
+    pull                     [ -> L_pull ]
+    try_pull                 [ -> L_try_pull ]
+    disconnect_pull_supplier [ -> L_disconnect ]
+    L_connect_helper
+    L_cleanup_helper
+
+StructPullSup (CosNotifyComm__POA.StructuredPullSupplier, CliMixin.C, SupMixin.C, PullSupMixin.C, PingCliMixin.C)
+    pull_structured_event               [ -> L_pull ]
+    try_pull_structured_event           [ -> L_try_pull ]
+    disconnect_structured_pull_supplier [ -> L_disconnect ]
+    L_connect_helper
+    L_cleanup_helper
+
+BatchPullSup (CosNotifyComm__POA.SequencePullSupplier, CliMixin.C, SupMixin.C, PullSupMixin.C, PingCliMixin.C)
+    pull_structured_events            [ -> L_pull ]
+    try_pull_structured_events        [ -> L_try_pull ]
+    disconnect_sequence_pull_supplier [ -> L_disconnect ]
+    L_connect_helper
+    L_cleanup_helper
+
+
+
+
+
+
+

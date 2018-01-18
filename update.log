@@ -1,0 +1,386 @@
+Fri May  7 09:58:46 EDT 2004 gruber
+===================================
+M lib/RDIRVM.cc
+
+fixed bug that I introduced when I added default arms to get rid of compiler warning  
+
+Tue Apr 20 17:43:58 EDT 2004 gruber
+===================================
+M include/RDIHashFuncs.h
+M include/omniNotify.h
+M lib/RDIOplocks.cc
+M lib/RDIRVM.cc
+M DEBUG.mk
+M README.win32
+A ReleaseNote_omniNotify_20
+R ReleaseNote_omniNotify_20_ALPHA
+
+final ? 2.0 release changes
+NDEBUG now the default, fix to VoidRank, default branches added to avoid compiler warning, changed version in omniNotify.h
+
+Mon Apr 19 09:51:34 EDT 2004 gruber
+===================================
+R THIS_IS_omniNotify_2_0_alpha
+A THIS_IS_omniNotify_2_0
+(for release)
+
+Thu Oct 23 00:25:42 EDT 2003 gruber
+===================================
+
+M DEBUG.mk
+M ReleaseNote_omniNotify_12
+M channel.cfg
+M standard.cfg
+M update.log
+M daemon/ReadyChannel_d.cc
+M daemon/dir.mk
+M examples/all_cosnotify_clients.cc
+M examples/dir.mk
+M examples/get_channel.h
+M examples/legacy_clients.cc
+M examples/legacy_clients.h
+M examples/main_program.h
+M examples/parse_cmd_line.h
+A examples/s512_push_consumer.cc
+A examples/s512_push_supplier.cc
+M examples/sample_clients.cc
+M examples/sample_clients.h
+M examples/sample_functions.cc
+M examples/sample_functions.h
+M examples/ten_any_pull_consumers.cc
+M include/CosEventChannelAdmin_i.h
+M include/CosNotification_i.h
+M include/CosNotifyChannelAdmin_i.h
+M include/CosNotifyFilter_i.h
+M include/CosNotifyShorthands.h
+M include/ModFlexLexer.h
+M include/RDI.h
+M include/RDIBitmap.h
+M include/RDICatchMacros.h
+M include/RDIChannelUtil.h
+M include/RDIConfig.h
+M include/RDIConstraint.h
+M include/RDIDynamicEvalDefs.h
+M include/RDIEvalDefs.h
+M include/RDIEvent.h
+M include/RDIEventQueue.h
+M include/RDIHash.h
+M include/RDIHashFuncs.h
+M include/RDIInteractive.h
+M include/RDIInteractiveMode.h
+M include/RDILimits.h
+M include/RDIList.h
+A include/RDILocksHeld.h
+M include/RDIMutex.h
+M include/RDINotifQueue.h
+M include/RDINotifServer.h
+M include/RDIOSWrappers.h
+M include/RDIOplocks.h
+M include/RDIOplocksMacros.h
+M include/RDIRVMPool.h
+A include/RDISafeList.h
+A include/RDISeqDecls.h
+M include/RDIStaticEvalDefs.h
+M include/RDIStringDefs.h
+M include/RDIThreadPriority.h
+M include/RDITimeWrappers.h
+M include/RDITypeMap.h
+M include/RDIUtil.h
+M include/corba_wrappers_impl.h
+M include/omniNotify.h
+M include/omnithread_thread_wrappers.h
+M include/thread_wrappers.h
+A include/thread_wrappers_impl.h
+M lib/ChannelAdmin_i.cc
+M lib/CosEventProxy.cc
+M lib/CosNfyUtils.cc
+M lib/CosNotification.cc
+M lib/EventChannel_i.cc
+M lib/FilterAdmin_i.cc
+M lib/Filter_i.cc
+M lib/ProxyConsumer.cc
+M lib/ProxySupplier.cc
+M lib/RDI.cc
+M lib/RDIChannelUtil.cc
+M lib/RDIConfig.cc
+M lib/RDIConstraint.cc
+M lib/RDIDynamicEval.cc
+M lib/RDIEval.cc
+M lib/RDIEventQueue.cc
+M lib/RDIInteractive.cc
+M lib/RDINotifQueue.cc
+M lib/RDINotifServer.cc
+M lib/RDIOpSeq.cc
+M lib/RDIOplocks.cc
+M lib/RDIParserRenames.h
+M lib/RDIParserTop.cc
+M lib/RDIParser_l.cc
+M lib/RDIParser_y.cc
+M lib/RDIRVM.cc
+M lib/RDIRVMPool.cc
+M lib/RDIStaticEval.cc
+M lib/RDITimeWrappers.cc
+M lib/RDITypeMap.cc
+M lib/RDIstrstream.cc
+M lib/corba_wrappers_impl.cc
+M lib/dir.mk
+M lib/lex.l
+M lib/omniNotify.cc
+M lib/yacc.y
+M mk/beforeauto.mk.in
+
+Introduced macros for lock scope, temporary lock release, other
+mutex ops, all of which have TW_DEBUG variants (requires
+modification to omnithread library to work, do not define TW_DEBUG
+without getting this mod).  Allows us to find possible deadlock
+scenarios.
+
+Results:
+  * All locks are now acquired/released using helper objects on the stack.
+  * All deadlock scenarios found have now been fixed.
+
+Added GC support, driven by the following server-level params (see
+channel.cfg for documentation):
+
+  ObjectGCPeriod
+  DeadChanInterval
+  DeadAdminInterval
+  DeadConProxyInterval
+  DeadOtherProxyInterval
+  DeadFilterInterval
+
+Thu Jul  3 14:01:23 EDT 2003 gruber
+===================================
+
+- Added better config comments/setup so NO_DEBUG controlled separately
+- Updated copyright
+
+DEBUG.mk
+
+- Added OutgoingTimeout and IncomingTimeout ServerQoS params
+- Updated copyright
+
+channel.cfg
+standard.cfg
+CosNotification_i.h
+RDINotifServer.h
+corba_wrappers.h
+omniorb_common_wrappers.h
+CosNotification.cc
+RDINotifServer.cc
+
+- Changed things so event lock is not held across push
+  (required different approach for omniORB3 vs. omniORB4).
+  Also remove all events from outgoing queue of a proxy
+  that gets _pxstatus set to RDI_Exception.
+- Updated copyright
+
+CosEventChannelAdmin_i.h
+CosNotifyChannelAdmin_i.h
+RDI.h
+CosEventProxy.cc
+EventChannel_i.cc
+ProxySupplier.cc
+RDIEventQueue.cc
+
+- Removed constraint on type and domain name that restricted to 
+  underscore and alphanum.  Any string without * allowed.
+- Updated copyright
+
+RDIEvent.h
+
+- Added fflush calls that seem to be needed for windows.
+- Updated copyright
+
+RDIInteractiveMode.h
+
+- Fixed small things like surrounding XXX_REMOVE code with #if 0 ... #endif
+  (removed unused variable, etc)
+- Updated copyright
+
+(every other .h, .cc, .pl, etc file!)
+
+
+
+
+
+
+
+Mon Jun 30 16:36:50 EDT 2003 gruber
+===================================
+
+- Added cvsignore files for ignoring build cruft
+
+daemon/.cvsignore
+lib/.cvsignore
+mkattlib/.cvsignore
+
+Thu Jun 19 21:18:18 BST 2003 dgrisby
+====================================
+
+- CVS mangled a make file.
+
+DEBUG.mk
+
+- Can't test for unistd.h until CORBA headers have been included.
+
+examples/demo_add_filter.cc
+examples/demo_offer_change.cc
+examples/demo_subscription_change.cc
+examples/ndadmin.cc
+examples/parse_cmd_line.h
+examples/some_notify_clients.cc
+
+
+Thu Jun 19 17:23:28 BST 2003 dgrisby
+====================================
+
+- Windows port.
+
+DEBUG.mk
+README.FIRST
+README.win32
+daemon/ReadyChannel_d.cc
+daemon/dir.mk
+examples/READING_THE_CODE
+examples/demo_add_filter.cc
+examples/demo_offer_change.cc
+examples/demo_subscription_change.cc
+examples/dir.mk
+examples/getopt_impl.h           -- new
+examples/ndadmin.cc
+examples/parse_cmd_line.h
+examples/sample_clients.cc
+examples/some_notify_clients.cc
+idl/AttNotification.idl
+include/CosNotifyChannelAdmin_i.h
+include/CosNotifyFilter_i.h
+include/GNUmakefile.in
+include/RDI.h
+include/RDIDynamicEvalDefs.h
+include/RDIEvent.h
+include/RDIOSWrappers.h
+include/RDIOplocks.h
+include/RDIStringDefs.h
+include/RDIsysdep.h              -- new
+include/omniorb_boa_wrappers.h
+include/omniorb_poa_wrappers.h
+lib/ChannelAdmin_i.cc
+lib/EventChannel_i.cc
+lib/Filter_i.cc
+lib/ProxyConsumer.cc
+lib/ProxySupplier.cc
+lib/RDIDynamicEval.cc
+lib/RDIRVM.cc
+lib/RDITimeWrappers.cc
+lib/dir.mk
+mkattlib/ATTN_sysdep.h
+mkattlib/dir.mk
+
+
+Mon Apr 14 16:29:11 BST 2003 dgrisby
+====================================
+
+- Stand-alone autoconf support.
+
+GNUmakefile.in
+README.FIRST
+README.unix
+ReleaseNote_omniNotify_20_alpha
+acinclude.m4                     -- new
+aclocal.m4                       -- new
+configure                        -- new
+configure.ac                     -- new
+dir.mk
+bin/scripts/config.guess         -- new
+bin/scripts/config.sub           -- new
+bin/scripts/distdate.py          -- new
+bin/scripts/install-sh           -- new
+bin/scripts/omkdirhier           -- new
+daemon/GNUmakefile.in
+daemon/dir.mk
+examples/GNUmakefile.in
+include/GNUmakefile.in           -- new
+lib/GNUmakefile.in
+lib/dir.mk
+mk/afterauto.mk.in               -- new
+mk/beforeauto.mk.in              -- new
+mk/cos.mk                        -- new
+mkattlib/GNUmakefile.in
+mkattlib/dir.mk
+mkattlib/libdefs.mk
+mkattlib/mkBOAlib/GNUmakefile.in
+mkattlib/mkBOAlib/dir.mk
+
+
+Mon Oct  9 16:29:48 EDT 2000
+============================
+
+omniNotify 1.0 released
+created branch for bug fixes
+
+November 30 2000
+================
+Extensive changes in preparation for 1.1 release.
+Almost every file changed in some way.
+
+omniNotify top
+--------------
+channel.cfg: added change pool initialization
+standard.cfg: added this file -- has the
+              defaults specified in the standard
+
+INCLUDE/LIB
+-----------
+
+* Fixed Bug # 1 :
+  Added support for non-zero PacingInterval
+
+* Fixed Bug # 2 :
+  Changed architecture of channel so that
+  offer_change and subscription_change messages
+  are sent to clients by thread pools rather than
+  by the thread running the client request which
+  triggered the change messages.
+
+* Fixed an unreported bug (we were holding a proxy oplock
+ across try_pull outcalls)
+
+* Use CORBA::Boolean instead of bool type hack
+
+* Reorganized proxy code to eliminate
+  a great deal of code duplication.  There is
+  still a lot more that could be done.
+
+* No longer using src/services/include/*.h
+  Instead, export relevant .h files to
+  src/services/include/omniNotify.
+
+  omake/gmake export_useful in omniNotify/lib
+  will export 'useful' .h files to appropriate locations.
+
+  Should encourage this usage pattern with
+  other COS services.
+
+* Rewrote corba_wrappers package.  Changed code to use
+  new package.  In theory, supports BOA and POA, but only
+  BOA has been tested.
+
+EXAMPLES
+--------
+* Changed examples to use POA rather than BOA
+  (channel still uses BOA for now).
+
+* Rewrote the example programs to place common code fragments
+  together; much easier to rewrite the code, also easier to see how
+  the different kinds of clients are programmed the same / different.
+  However, harder for novice to read, so added 
+  READING_THE_CODE to examples dir.
+
+* We now have one of each kind of client (16
+  total, 12 new kinds of proxies, 4 legacy proxies).  All the new kinds
+  of proxies support addition of a filter, rather than having separate
+  examples for use of filtering.
+  Also a program that starts all 12 new-style clients, and some
+  demo programs that modify the behavior of running clients.
+

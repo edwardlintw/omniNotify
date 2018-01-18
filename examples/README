@@ -1,0 +1,361 @@
+OVERVIEW
+--------
+
+For the CosNotification interfaces, a client can:
+  * be a supplier or consumer
+  * use a push-based or pull-based mechanism
+  * push/pull one of these event kinds
+      + CORBA::Any
+      + CosNotification::StructuredEvent
+      + CosNotification::EventBatch
+The result is TWELVE kinds of clients.  We provide 1 example of each:
+
+  any_push_consumer.cc, any_push_supplier.cc
+  any_pull_consumer.cc, any_pull_supplier.cc
+
+  struct_push_consumer.cc, struct_push_supplier.cc
+  struct_pull_consumer.cc, struct_pull_supplier.cc
+
+  batch_push_consumer.cc, batch_push_supplier.cc
+  batch_pull_consumer.cc, batch_pull_supplier.cc
+
+The old-style CosEvents interfaces support push/pull of CORBA::Any events,
+giving 4 kinds of legacy clients.  Again we provide 1 example of each:
+
+  legacy_push_consumer.cc, legacy_push_supplier.cc
+  legacy_pull_consumer.cc, legacy_pull_supplier.cc
+
+We also provide a couple helper programs; they are discussed below
+under RUNNING THE EXAMPLES:
+
+  demo_add_filter.cc
+  demo_offer_change.cc
+
+READING THE CODE
+----------------
+All 16 examples are similar in structure.  To make it easier for
+the person writing the examples, common code is grouped into
+helper files (such as main_program.h) and all the important client
+classes have been grouped into regular and legacy client
+cases (sample_clients.h/.cc and legacy_clients.h/.cc).
+
+Although this organization makes it easy to modify all 16
+examples without having to edit 16+ files, it makes it
+harder for a novice to read the code.  For that reason we
+have provided the file READING_THE_CODE which gives an
+overview of how to read all of the code in the examples
+directory.
+
+RUNNING THE EXAMPLES
+--------------------
+
+You can start 4 xterms (command prompt windows, whatever)
++ do a fully interactive demo from the 4 command prompts.
+You can also write a script or program that starts up all
+the channel and a set of suppliers and consumers.
+Here we assume you are doing the interactive demo.
+
+(1) Start notifd
+----------------
+
+I usually start the notifd like this:
+
+prompt> notifd -i -c <omni_top>/src/services/omniNotify/channel.cfg
+
+This makes the daemon interactive and tells it to configure
+using the channel.cfg.
+
+One thing channel.cfg specifies is locations for 2 IORs: notifd should
+put a factory IOR in /tmp/rdifact.ior and a channel IOR in
+/tmp/rdichan.ior (you can change these locations by editing
+channel.cfg).  It also specifies that the default channel should
+register itself with the name service using "EventChannel".
+
+The example clients try to find the channel using both the naming
+service and, as a backup, the IOR file.  If you change the location of
+the IOR file and the name that is used to register the channel, you
+need to specify a name or an IOR file (using the -n or -f options).
+
+(2) Start one or more consumers
+-------------------------------
+
+Starting consumers first (before starting any suppliers) makes sense
+because the consumers will simply block until events start arriving
+at the channel.
+
+There are 6 new-style consumers:
+    any_push_consumer.cc,     any_pull_consumer.cc,
+    struct_push_consumer.cc,  struct_pull_consumer.cc,
+    batch_push_consumer.cc,   batch_pull_consumer.cc
+and 2 CosEvents-style consumers:
+    legacy_push_consumer.cc,  legacy_pull_consumer.cc
+
+You can start any # of them; 1 is enough for a simple demo.  In
+addition to the -n and -f options discussed above, you can use the
+following.
+
+You can give the number of events to consume using the -d option.
+The default for -d is zero which means consume events 'forever'.
+
+** Use of the -m option:
+
+For pull consumers, -m is used to specify the number of milliseconds
+to wait between each pull call that is performed by the consumer.
+A value of 0 means pull as fast as possible.
+
+For push consumers, -m is used to specify the interval between "pings"
+of the consumer's proxy.  A value of 0 means do not use pings.
+(Pings are used to detect that a channel has crashed; if no pings are
+used, the consumer will wait indefinetely for the next push call.)
+
+Zero is the default value for -m.
+
+The -p option is used to specify a filename for storing the IOR
+of the proxy that the consumer connects to.  This option is used
+in combination with the demo_subscription_change or
+demo_add_filter helper clients (see below).
+
+For new-style consumers, the -t and -e options are available for
+specifying a filter to be added to the proxy that the consumer
+connects to.  This filter controls which events the consumer will
+receive (via push or pull).  If no filter is specified, the consumer
+will initially receive all events, and this can then be changed while
+the consumer is running using either the demo_subscription_change or
+demo_add_fitler helper clients.  The argument to -t is a
+comma-separated list of event types, and can have no spaces.  The
+argument to -e is a constraint expression written in the default
+constraint language defined by the CosNotification spec.  We give some
+constraint examples in the "demo_add_filter" section.
+
+To see some output for each event that is consumed, use the -v option.
+
+Example:
+
+   prompt> struct_push_consumer -d 200 -p cproxy.ior -v
+
+The consumer will consume 200 events then exit.  The consumer's
+proxy's ior is stored in cproxy.ior.  All event types are received,
+even events supplied by suppliers that provide type CORBA::Any events.
+(The struct and batch consumers only 'understand' Stock::Ticker events
+but they will print an acknowledgement when they receive other kinds
+of events.)
+
+   prompt> struct_push_consumer -d 200 -p cproxy.ior -t Stock::Ticker -v
+
+As above except the consumer will only receive Stock::Ticker events.
+If you run the legacy_*_supplier or any_*_supplier clients, no events
+will be received, as only the struct_*_supplier and batch_*_supplier
+clients supply Stock::Ticker events.
+
+
+(3) Start one or more suppliers
+-------------------------------
+
+There are 6 new-style suppliers:
+    any_push_supplier.cc,     any_pull_supplier.cc,
+    struct_push_supplier.cc,  struct_pull_supplier.cc,
+    batch_push_supplier.cc,   batch_pull_supplier.cc
+and 2 CosEvents-style suppliers:
+    legacy_push_supplier.cc,  legacy_pull_supplier.cc
+
+You can start any # of them; 1 is enough for a simple demo.
+In addition to the -n and -f options discussed above,
+you can use the following.
+
+The -d option specifies how many events to supply.  The default
+of zero means supply events forever.
+
+** Use of the -m option:
+
+For push suppliers, -m is used to specify the number of milliseconds
+to wait between each push call that is performed by the supplier.  A
+value of 0 means push as fast as possible.  
+
+For pull suppliers, -m is used to specify the interval between "pings"
+of the supplier's proxy.  A value of 0 means do not use pings.
+(Pings are used to detect that a channel has crashed; if no pings are
+used, the supplier will wait indefinetely for the next pull call.)
+
+Zero is the default value for -m.
+
+** For interactive demos when you are viewing what is happening using
+** the -v option, it makes sense to use a push supplier and to use a
+** -m value of 1000 (1 second pause between supplying each event).
+
+The -p option is used to specify a filename for storing the IOR of the
+proxy that the supplier connects to.  This option is used in
+combination with the demo_offer_change helper client (see below).
+(You can only use new-style suppliers with the demo_offer_change
+helper program.)
+
+For new-style suppliers, the -t and -e options are available for
+specifying a filter to be added to the proxy that the supplier
+connects to.  This will be a "supply-side" filter that only acts on
+the events provided by this particular supplier client, and can be
+thought of a simple means of discarding supplied events prior to
+actually having the events processed by the main consumer-side filter
+matching machinery.  (Supply-side filters are rarely used, compared to
+consume-side filters.)  The argument to -t is a comma-separated list
+of event types, and can have no spaces.  The argument to -e is a
+constraint expression written in the default constraint language
+defined by the CosNotification spec.  We give some constraint examples
+in the "demo_add_filter" section.
+
+To see some output for each event that is supplied, use the -v option.
+
+Examples:
+
+   prompt> struct_push_suppplier -d 500 -m 1000 -v
+
+Supplies 500 Stock::Ticker events, with a 2 second pause between each.
+
+   prompt> struct_push_suppplier -d 500 -m 1000 -e '$Value >= 20' -v
+
+As above, except Stock::Ticker events with Value less than 20 are
+discarded by the supplier's proxy as soon as they reach the channel.
+
+(4) Additional "Helper" Client: demo_add_filter
+-----------------------------------------------
+
+If you used the -p option for one of the consumers that you started,
+you can use demo_add_filter to filter the events arriving at that
+consumer.  Here we assume that you used -p cproxy.ior ...
+
+NOTE: this discussion assumes you are using struct_*_supplier or
+batch_*_supplier for your supplier.  I.e., it assumes you are using
+clients that supply Stock::Ticker and Bond::Ticker events.  These
+suppliers announce events for 5 stocks (A, B, C, D, E) and 5 bonds (F,
+G, H, I, J) with a Name field and a Value field.  You must use -v
+option with the consumer to observe the impact of adding or changing a
+filter.  (We suggest using the struct_push_consumer client and using
+struct_push_supplier with -m 1000 so that the consumer will not be
+flooded with event output.)
+
+You start the program with the same -p option you used with the consumer, e.g.,
+
+prompt> demo_add_filter -p cproxy.ior
+
+The client will prompt you to enter a constraint expression.  After
+typing an expression and hitting return, the client will replace any
+existing filters with a new filter that contains the constraint you
+specified.
+
+Here are some example filters:
+
+  false
+  true
+  $Name < 'D'
+  $Name == 'F' and $Value >= 20 and $Value <= 30
+
+The constraint expression `false' trivially evaluates to false, so the
+consumer will stop receiving events.  Similarly, `true' will cause it
+to receive all events supplied to the channel.
+
+The expression
+    $Name < 'D'
+will match events for stocks A, B, and C, as these are the only
+names "less than" D.
+
+The expression
+    $Name == 'F' and $Value >= 20 and $Value <= 30
+will only match Stock::Bond events for bond F that
+have a Value that is between 20 and 30 inclusive.
+
+You can exit the demo_add_filter program by entering
+  exit
+as the constraint.
+
+(Note that demo_add_filter causes subscription_change messages to be
+sent out: each constraint expression that is entered causes a filter
+removal followed by a filter addition, which means there are typically
+2 subscription_change messages generated, one with a list of event
+types to remove, one with a list of event types to add.  Since it
+uses *::* for the event type, this is always the type that is
+removed/added.)
+
+(5) Additional "Helper" Client: demo_subscription_change
+--------------------------------------------------------
+
+If you start a consumer with the -p option then you can use
+demo_subscription_change to cause subscription_change messages to be
+sent to this consumer's proxy.  Here we assume that you
+used -p cproxy.ior ...
+
+NOTE: For a consumer that has no attached filters, subscription_change
+messages serve to control the event types that it receives.  However,
+if filters have been added to the proxy then subscription_change
+messages will have NO EFFECT.  This is the specified semantics from
+the spec -- the idea being that once you start giving explicit filters
+you should no longer be using subscription_change directly (but rather
+modifying, adding, or removing filters) to change the event type
+subscriptions.
+
+You start the program with the same -p option you used with the consumer, e.g.,
+
+prompt> demo_subscription_change -p cproxy.ior
+
+After this you are prompted first for a list of types to be removed,
+then for a list of types to be added.  You must enter comma-separated
+lists with no spaces between the types or in the type names; hit
+return after each list.  (Hit return immediately for an empty list.)
+
+A subscription_change message is sent to the proxy, and then you are
+prompted for another pair of lists.  You can enter exit instead of a
+type list to quit the program.
+
+As with demo_add_filter, we suggest using the struct_push_consumer
+client and using struct_push_supplier with -m 1000 so that the
+consumer will not be flooded with event output.  In this case,
+try the following sequence:
+
+(At the start the consumer should be receiving both
+ Stock::Ticker and Bond::Ticker event types.)
+---------------------------------------------------------
+
+Enter list of removals (or empty for none): 
+*::*<return>
+
+Enter list of additions (or empty for none): 
+Stock::Ticker
+
+(Only Stock::Ticker events should be received.)
+---------------------------------------------------------
+
+Enter list of removals (or empty for none): 
+Stock::Ticker
+
+Enter list of additions (or empty for none): 
+Bond::Ticker
+
+(Only Bond::Ticker events should be received.)
+
+---------------------------------------------------------
+
+
+(6) Additional "Helper" Client: demo_offer_change
+--------------------------------------------------
+
+** NOTE: There is no real reason to use demo_offer_change, since the
+example consumers do not change their behavior because on what
+event types have been offered.  This helper program is really just
+a convenient way to test whether the offer_change mechanism
+implemented by the notification channel is working.
+
+If you start a supplier with the -p option then you can use
+demo_offer_change to cause offer_change messages to be sent
+to this supplier's proxy.  Here we assume that you
+used -p sproxy.ior ...
+
+You start the program with the same -p option you used with the consumer, e.g.,
+
+prompt> demo_offer_change -p sproxy.ior
+
+After this you are prompted first for a list of types to be removed,
+then for a list of types to be added.  You must enter comma-separated
+lists with no spaces between the types or in the type names; hit
+return after each list.  (Hit return immediately for an empty list.)
+
+An offer_change message is sent to the proxy, and then
+you are prompted for another pair of lists.  You can enter
+exit instead of a type list to quit the program.
+

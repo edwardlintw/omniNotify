@@ -1,0 +1,102 @@
+This file contains information on installing, building and using
+omniNotify on Unix platforms.
+
+It should be possible to build omniNotify on most of the platforms on
+which one can build the omniORB libraries.  So far we have
+successfully built omniNotify on:
+ 
+ * Linux 2.x (x86)/egcs-1.1.2/binutils-2.9.1.0.14/GNU Libc version 2
+ * Solaris 2.{5,6}/ Sun SparcCompiler C++ version 4.2
+ * SGI Irix 6.x/SGI C++ compiler 7.2
+ * HP-UP 11.0 / aCC
+
+If you find that some changes are required to build omniNotify on
+another platform, please send us the changes so that we can
+incorporate them into the omniNotify source tree.  (See the contact
+information in the README.FIRST file.)
+
+
+Roadmap
+=======
+
+The directory structure of the omniNotify source tree is:
+
+./daemon		: source files for the omniNotify daemon
+./examples		: source files for examples
+./include		: include files
+./lib			: source files for the omniNotify library
+./mk			: make files
+./bin/scripts		: scripts used by autoconf
+./wwwfiles		: omniNotify WEB pages
+
+
+Configuration
+=============
+
+There are two ways to configure and build omniNotify. The easiest way
+for most Unix platforms is to use the Autoconf configure script. On
+other platforms, you must use the manual configuration process.
+
+Note that for both build schemes, you must use GNU make. If GNU make
+has a different name (e.g. 'gmake' or 'gnumake'), substitute that for
+'make' in the instructions below.
+
+
+Autoconf configure script
+-------------------------
+
+To use the configure script, extract or check out the omniNotify
+source in any suitable directory. Then perform the following steps:
+
+  $ cd [omniNotify directory]
+  $ mkdir build
+  $ cd build
+  $ ../configure [configure options]
+  $ make
+  $ make install
+
+Run configure --help to get a list of configuration options. Most
+options are standard Autoconf ones. The most commonly required is
+--prefix, used to select the install location. The default is
+/usr/local. To change it, use, for example
+
+  ../configure --prefix=/home/fred/omni_inst
+
+If you use a different prefix to the omniORB install, you must give
+the location to omniORB with the --with-omniorb= option.
+
+The configure script tries to figure out the location of the C and C++
+compilers. It will always choose gcc over the platform's native
+compiler if it is available. To change the choices it makes, use
+variables CC and CXX, e.g.:
+
+  ../configure CXX=/usr/bin/platform_c++
+
+
+Manual configuration
+--------------------
+
+On platforms where the configure script does not work, you must build
+and configure omniORB using the manual configuration, based on editing
+<OMNI_TOP>/config/config.mk. Then, in the omniORB tree, extract
+omniNotify so it is in the directory <OMNI_TOP>/src/services.
+
+We refer to directory <OMNI_TOP>/src/services/omniNotify as
+<NOTIFY_TOP>.
+  
+To build and install everything, simply go into the directory
+<NOTIFY_TOP> and type 'make export'. If all goes well, the libraries
+and executables will be installed into <OMNI_TOP>/lib/<platform>/ and
+<OMNI_TOP>/bin/<platform>/ -- note that these directories are located
+under the top of the omniORB installation tree, not the omniNotify
+subtree.
+
+ 
+Examples
+========
+
+You are strongly encouraged to try out the examples provided in
+<NOTIFY_TOP>/examples. They are built during the normal compile.
+
+The file <NOTIFY_TOP>/examples/README describes what the example
+programs do and how to run them.

@@ -1,0 +1,142 @@
+[1.1 RELEASE NOTES]
+
+These are the release notes for omniNotify 1.1.
+
+Release 1.1 depends on omniORB version 3.0.4.  It does not work
+with omniORB 4.x.  omniNotify release 2.0 and later will work
+with omniORB 4.x.
+
+It should be possible to build omniNotify on most of the platforms on
+which one can build the omniORB libraries. So far, we have
+successfully built omniNotify on:
+
+ * Linux 2.x (x86)/egcs-1.1.2/binutils-2.9.1.0.14/GNU Libc version 2
+ * Solaris 2.{5,6,7}/ Sun SparcCompiler C++ version 4.2
+ * SGI Irix 6.x/SGI C++ compiler 7.2
+
+omniNotify is not yet a complete implementation of the CORBA
+Notification Service specification. The following features are not
+supported in the current release.
+
+  * Mapping filters
+  * Persistent Events and State
+  * some wilcard cases -- see the omniNotify 1.0 release notes
+
+The following are the changes since release 1.0
+
+ADDED FUNCTIONALITY
+
+* Added support for non-zero PacingInterval.
+ 
+* Added support for OrderPolicy and DiscardPolicy.
+
+* Added new logging facility, with debug and report logs
+  and flags for controlling what is logged to each. 
+  See the flags in channel.cfg.
+
+* Added new idl, AttNotification.idl, with interfaces for each major
+  entity managed by omniNotify (server, channel factory, filter factory,
+  channels, admins, and proxies).  You can narrow a CosNotif* reference
+  to get an AttNotification reference and use it to obtain additional
+  non-standard functionality, described in the following items.  The idl
+  file sits in an idl subdir of omniNotify tree, rather than at omniORB
+  root idl, to allow us to update omniNotify idl without having to
+  coordinate with omniORB releases.  A new library for AttNotification
+  stubs and skeletons has been added as well.  The server links against
+  this library as well as the omniORB-level COS library.
+
+* Added server-level configuration properties, called ServerQoS
+  properties.  Moved a number of the AdminQoS properties to be ServerQoS
+  properties (the ones that can only be set at the server level, i.e.,
+  ones that cannot have different settings for different channels).
+  AttNotification::Server supports get_server_props and
+  set_server_props.
+
+* AttNotification::ChannelFactory supports the QoSAdmin (set_qos) and
+  AdminPropertiesAdmin (set_admin) interfaces, allowing one to get/set
+  theNotifQoS and AdminQoS properties that are used as *defaults* by the
+  channel factory for construction of new channels.  
+
+* (3) Added support for controlling each major kind of entity
+     (factory, channel, admin, proxy) using do_command.
+    notifd -i option now feeds input 
+    to the 'current' entity using do_command.
+    Use 'help' for details.
+
+EXTENDED AND COMPLETELY REWROTE THE EXAMPLES
+
+The examples now use POA stubs and skeletons (the 1.0 examples are
+BOA-based examples).  The client code used in the examples is more
+"real" (more robust, more options, ...). All 16 kinds of channel
+clients are now represented, and a common code base is used, making it
+much easier to consistently modify all the examples.  
+
+Since the beta release, the clients now clean up after themselves
+better as well: the admins, proxies, and filters that they constructed
+at the channel are now destroyed on exit.
+
+The advantage of this approach is that the examples should be a good
+starting point for writing real client applications. The disadvatage
+is that these examples can be hard for a novice programmer to
+read. (We added a file READING_THE_CODE which should help some.)
+
+
+LIBRARY CODE IMPROVEMENTS
+
+* Removed static array bounds limit on thread stat array.
+  Similar/related: changed to using global hash table to assign one
+  RVM per thread that does filter evaluation.
+
+* Replaced unix-specific time stuff with RDITimeWrappers module.
+  (RDITime.h/.cc, RDITimeDefs.h have been removed.)
+   No more dependencies on Unix syscalls for time stuff,
+   now we just use omni_thread::get_time.  Local clock
+   accuracy and time zone must be specified in config
+   file / as ServerQoS params.
+
+* Continued to reduce the level of cut-n-paste code duplication...
+  still more can be done.
+
+* One side-effect of new logging facility is none of our .h files
+  include <iostream.h> anymore.  The flex-generated lexer still
+  includes it, however :-<  It would be great to get rid of this
+  last case.
+
+FIXED ALL KNOWN 1.0 BUGS
+
+  * [Reported by ...] Due to silly coding error, the channel ior file was
+    not being created in certain cases.  FIXED. 
+ 
+  * [Report by ...] Changed architecture so that offer_change and
+    subscription_change msgs are sent by threads in special thread pools
+    rather than by the thread running the client request which
+    triggers the change message.  Added ServerQoS properties for
+    thread pool sizes (see channel.cfg). FIXED.
+
+  * [Caught by internal testing] Fixed case where channel 
+    incorrectly held proxy lock across try_pull outcall. FIXED.
+
+FIXED ALL OTHER (post 1.0?) BUGS
+
+* [Reported by ...] When a proxy connected to an external supplier is 
+  disconnected/destroyed or enters an exceptional state, the set of types
+  it had offered via offer_change was not properly retracted.  FIXED.
+
+* [Reported by Janet Tvedt] Destruction of a ConsumerAdmin or SupplierAdmin
+   did not properly handle cleanup of proxy information in certain omniNotify
+   internal data structures.  Resulted in core dump in some cases, while in
+   other cases a consumer continued to get notifications even after its admin
+   had been destroyed.  FIXED.
+
+* [Caught by internal testing.]  Fixed some errors in channel shutdown sequence
+   which, in rare cases, resulted in a deadlock.  FIXED.
+
+* [Caught by internal testing.]  Evaluation of supply-side filters for 
+   CORBA::Any events had not been implemented.  Also, stats (match and eval
+   counts) were not tracked properly for supply side filtering.  FIXED.
+
+* [Caught by internal testing.]  The default channel (channel zero)
+   was correctly initialized (from config file, env variables, command line args)
+   but all other channels were created based only on the built-in defaults.
+   FIXED.
+
